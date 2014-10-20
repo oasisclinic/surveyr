@@ -4,9 +4,8 @@
 
 # Home page
 GET     /                           controllers.Application.index()
-GET     /start                      controllers.Application.redirect()
-GET     /add                        controllers.Application.add()
-GET     /show                       controllers.Application.show()
+GET     /demo/begin                 controllers.Application.takeDemoSurvey()
+GET     /demo/complete/:requestId/:responseSetId              controllers.Application.completeDemoSurvey(requestId: String, responseSetId: String)
 
 # Map static resources from the /public folder to the /assets URL path
 GET     /assets/*file               controllers.Assets.at(path="/public", file)
