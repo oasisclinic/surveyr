@@ -1,3 +1,5 @@
+import play.PlayJava
+
 name := """play-java"""
 
 version := "1.0-SNAPSHOT"
@@ -11,5 +13,6 @@ libraryDependencies ++= Seq(
   javaEbean,
   cache,
   javaWs,
-  "uk.co.panaxiom" %% "play-jongo" % "0.7.1-jongo1.0"
+  "uk.co.panaxiom" %% "play-jongo" % "0.7.1-jongo1.0",
+  "com.wordnik" %% "swagger-play2" % "1.3.10"
 )

@@ -2,6 +2,7 @@ package controllers;
 
 import models.OutstandingSurveyResult;
 
+import models.SurveyResponse;
 import play.libs.ws.*;
 import play.mvc.Result;
 
@@ -34,25 +35,26 @@ public class Application extends Controller {
         return redirect(url);
     }
 
-    public static Promise<Result> completeDemoSurvey(String requestId, String responseSetId) {
-
-        OutstandingSurveyResult s = OutstandingSurveyResult.findByRequestId(requestId);
-        s.setResponseSetId(responseSetId);
-
-        String url = "https://survey.qualtrics.com/WRAPI/ControlPanel/api.php?Request=getLegacyResponseData&Format=JSON&User=720326365%23unc&Token=czqtiOXIJOk7nbZ0J8wlfiYn2wNjhKxntyhRChXi&Version=2.4";
-        url += "&SurveyID=" + s.getSurveyId();
-        url += "&ResponseID=" + s.getResponseSetId();
-
-        final Promise<Result> resultPromise = WS.url(url).get().map(
-                new Function<WSResponse, Result>() {
-                    public Result apply(WSResponse response) {
-                        return ok("Response:" + response.asJson());
-                    }
-                }
-        );
-
-        return resultPromise;
-
-    }
+//    public static Promise<Result> completeDemoSurvey(String requestId, String responseSetId) {
+//
+//        OutstandingSurveyResult s = OutstandingSurveyResult.findByRequestId(requestId);
+//        //s.setResponseSetId(responseSetId);
+//
+//        String url = "https://survey.qualtrics.com/WRAPI/ControlPanel/api.php?Request=getLegacyResponseData&Format=JSON&User=720326365%23unc&Token=czqtiOXIJOk7nbZ0J8wlfiYn2wNjhKxntyhRChXi&Version=2.4";
+//        url += "&SurveyID=" + s.getSurveyId();
+//        url += "&ResponseID=" + responseSetId;
+//
+//        final Promise<Result> resultPromise = WS.url(url).get().map(
+//                new Function<WSResponse, Result>() {
+//                    public Result apply(WSResponse response) {
+//                        SurveyResponse s = SurveyResponse.createFromResult(response.asJson());
+//                        return ok(response.asJson());
+//                    }
+//                }
+//        );
+//
+//        return resultPromise;
+//
+//    }
 
 }
