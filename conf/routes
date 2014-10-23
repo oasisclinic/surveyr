@@ -5,12 +5,13 @@
 # Home page
 GET     /                           controllers.Application.index()
 GET     /demo/begin                 controllers.Application.takeDemoSurvey()
-# GET     /demo/complete/:requestId/:responseSetId              controllers.Application.completeDemoSurvey(requestId: String, responseSetId: String)
+GET     /demo/complete/:requestId/:responseSetId              controllers.Application.completeDemoSurvey(requestId: String, responseSetId: String)
+GET     /ram   controllers.Application.ram()
 
 
 # API
 OPTIONS /api/*wholepath                 controllers.BaseApiController.options(wholepath)
-GET     /api/surveyResponses/:id        controllers.SurveyResponseApiController.findById(id)
+GET     /api/surveyResponses/:surveyId/:patientId        controllers.SurveyResponseApiController.findByPatientId(surveyId, patientId)
 
 # API documentation
 OPTIONS /api-docs/*wholepath             controllers.BaseApiController.options(wholepath)

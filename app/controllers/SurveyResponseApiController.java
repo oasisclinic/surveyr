@@ -10,13 +10,11 @@ import javax.ws.rs.*;
 @Api(value = "/api/surveyResponses", description = "Operations involving survey data retrieval.")
 public class SurveyResponseApiController extends BaseApiController {
 
-    @ApiOperation(nickname="findById", value = "Add a new pet to the store", httpMethod = "GET", response = SurveyResponse.class)
+    @ApiOperation(nickname="findByPatientId", value = "Add a new pet to the store", httpMethod = "GET", responseContainer = "List", response = SurveyResponse.class)
     @ApiResponses(value = {@ApiResponse(code = 405, message = "Invalid input")})
-    public static Result findById(@PathParam("id") String id) {
+    public static Result findByPatientId(@PathParam("surveyId") String surveyId, @PathParam("patientId") String patientId) {
 
-        SurveyResponse s = new SurveyResponse();
-        s.prop = "asdfasdf";
-        return JsonResponse(s);
+        return JsonResponse(SurveyResponse.findByPatientId(surveyId, patientId));
 
     }
 

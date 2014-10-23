@@ -4,50 +4,45 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.bson.types.ObjectId;
+import org.jongo.*;
 import play.Logger;
+import uk.co.panaxiom.playjongo.PlayJongo;
 
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 public class SurveyResponse {
 
     @JsonProperty("_id")
     public ObjectId id;
 
-    public String prop;
+    public String patientId;
 
-    public Set<JsonNode> answers;
+    public String surveyId;
+
+    public JsonNode data;
 
     public SurveyResponse() {
 
     }
 
-//    public static SurveyResponse createFromResult(JsonNode source) {
-//
-//        Logger.debug("entering");
-//        SurveyResponse s = new SurveyResponse();
-//        ObjectMapper mapper = new ObjectMapper();
-//        HashSet<JsonNode> props = new HashSet<>();
-//
-//        Iterator it = source.fields();
-//        while(it.hasNext());
-//        {
-//            Map.Entry<String, JsonNode> elt = (Map.Entry<String, JsonNode>) it.next();
-//            Logger.debug("checking " + elt.getKey());
-//            if (elt.getKey().contains("QID"))
-//            {
-//                Logger.debug("added value");
-//                props.add(elt.getValue());
-//            }
-//        }
-//
-//        s.answers = props;
-//        return s;
-//
-//    }
+    private static MongoCollection results(String surveyId) {
+        return PlayJongo.getCollection(surveyId);
+    }
 
+    public SurveyResponse insert() {
+        results(this.surveyId).save(this);
+        return this;
+    }
 
+    public static List<SurveyResponse> findByPatientId(String surveyId, String patientId) {
+
+        ArrayList<SurveyResponse> results = new ArrayList<>();
+        Iterable<SurveyResponse> t = results(surveyId).find("{patientId: #}", patientId).as(SurveyResponse.class);
+        Iterator i = t.iterator();
+        while (i.hasNext()) {
+            results.add((SurveyResponse) i.next());
+        }
+        return results;
+    }
 
 }
