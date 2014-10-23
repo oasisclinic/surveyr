@@ -3,6 +3,7 @@ package controllers;
 import com.fasterxml.jackson.databind.JsonNode;
 import models.OutstandingSurveyResult;
 import models.QualtricsAPI;
+import models.SurveyDefinition;
 import models.SurveyResponse;
 import org.w3c.dom.Document;
 import play.libs.Json;
@@ -14,6 +15,8 @@ import play.mvc.Controller;
 import play.mvc.Result;
 import views.html.index;
 
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.Unmarshaller;
 import java.util.UUID;
 
 import static play.libs.F.Function;
@@ -82,7 +85,13 @@ public class Application extends Controller {
                 list -> {
                     JsonNode n = list.get(0).asJson();
                     Document d = XML.fromString(list.get(1).getBody());
-                    return ok(Json.toJson(n));
+
+                    JAXBContext jaxbContext = JAXBContext.newInstance(SurveyDefinition.class);
+
+                    Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller();
+                    SurveyDefinition def = (SurveyDefinition) jaxbUnmarshaller.unmarshal(list.get(1).getBodyAsStream());
+
+                    return ok(Json.toJson(def));
                 }
         );
 

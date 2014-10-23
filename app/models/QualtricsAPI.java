@@ -1,5 +1,9 @@
 package models;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import org.json4s.Xml;
+import org.w3c.dom.Document;
+import org.w3c.dom.NodeList;
 import play.Configuration;
 import play.Play;
 import play.libs.ws.*;
@@ -21,6 +25,14 @@ public abstract class QualtricsAPI {
                 .setQueryParameter("User", API_USERNAME)
                 .setQueryParameter("Token", API_TOKEN)
                 .setQueryParameter("Version", API_VERSION);
+
+    }
+
+    public static void combine(JsonNode surveyResponse, Document survey) {
+
+        NodeList questions = survey.getElementsByTagName("Questions");
+
+
 
     }
 }
