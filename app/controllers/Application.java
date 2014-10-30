@@ -1,11 +1,12 @@
 package controllers;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import models.OutstandingSurveyResult;
-import models.QualtricsAPI;
-import models.SurveyDefinition;
-import models.SurveyResponse;
+import models.*;
 import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+import play.Logger;
 import play.libs.Json;
 import play.libs.XML;
 import play.libs.ws.WS;
@@ -17,7 +18,7 @@ import views.html.index;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.Unmarshaller;
-import java.util.UUID;
+import java.util.*;
 
 import static play.libs.F.Function;
 import static play.libs.F.Promise;
@@ -75,7 +76,7 @@ public class Application extends Controller {
         WSRequestHolder survey = QualtricsAPI.request("getLegacyResponseData")
                 .setQueryParameter("Format", "JSON")
                 .setQueryParameter("SurveyID", "SV_0JSC2ShChssXa61")
-                .setQueryParameter("ResponseID", "R_b18rd1LAM7muty5")
+                .setQueryParameter("ResponseID", "R_1M71Wr08ZliBUMu")
                 .setQueryParameter("ExportQuestionIDs", "1");
 
         WSRequestHolder surveyDef = QualtricsAPI.request("getSurvey")
@@ -83,15 +84,46 @@ public class Application extends Controller {
 
         Promise<Result> results = Promise.sequence(survey.get(), surveyDef.get()).map(
                 list -> {
-                    JsonNode n = list.get(0).asJson();
+
+                    JsonNode n = list.get(0).asJson().get("R_1M71Wr08ZliBUMu");
                     Document d = XML.fromString(list.get(1).getBody());
 
-                    JAXBContext jaxbContext = JAXBContext.newInstance(SurveyDefinition.class);
+                    PatientSurveyHistoryDTO psh = new PatientSurveyHistoryDTO("R_1M71Wr08ZliBUMu", "720326365");
+                    SurveyDataDTO dataDTO = new SurveyDataDTO(new Date());
 
-                    Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller();
-                    SurveyDefinition def = (SurveyDefinition) jaxbUnmarshaller.unmarshal(list.get(1).getBodyAsStream());
+                    HashMap<String, String> q = new HashMap<>();
+                    Iterator<Map.Entry<String, JsonNode>> it = n.fields();
+                    int i = 0;
+                    while(it.hasNext()) {
 
-                    return ok(Json.toJson(def));
+                        Map.Entry<String, JsonNode> o = it.next();
+                        if (o.getKey().matches("[Q][I][D]\\d") || o.getKey().matches("[Q][I][D]\\d[_]\\d")) {
+
+                            dataDTO.addData(String.valueOf(i), o.getValue().asInt());
+
+                            NodeList l = d.getElementsByTagName("Questions").item(0).getChildNodes();
+                            for (int z = 0; z < l.getLength(); z++) {
+
+                                Node node = l.item(z);
+                                Element e = (Element) node;
+                                if (o.getKey().contains(e.getAttribute("QuestionID"))) {
+
+                                    q.put(String.valueOf(i), e.getElementsByTagName("QuestionDescription").item(0).getTextContent());
+
+                                }
+
+                            }
+
+                            i++;
+                        }
+
+
+                    }
+
+
+                    psh.addData(dataDTO);
+                    psh.setDefinition(q);
+                    return ok(Json.toJson(psh));
                 }
         );
 
