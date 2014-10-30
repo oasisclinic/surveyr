@@ -33,7 +33,7 @@ public class Application extends Controller {
 
         OutstandingSurveyResult s = new OutstandingSurveyResult();
         s.setMedicalId("720326365");
-        s.setSurveyId("SV_0JSC2ShChssXa61");
+        s.setSurveyId("SV_9Nd6BW5oHtdtGLP");
         s.setRequestId(UUID.randomUUID().toString());
         s.insert();
 
@@ -49,20 +49,22 @@ public class Application extends Controller {
         OutstandingSurveyResult s = OutstandingSurveyResult.findByRequestId(requestId);
         s.setResponseSetId(responseSetId);
 
-        String url = "https://survey.qualtrics.com/WRAPI/ControlPanel/api.php?Request=getLegacyResponseData&Format=JSON&User=720326365%23unc&Token=czqtiOXIJOk7nbZ0J8wlfiYn2wNjhKxntyhRChXi&Version=2.4";
-        url += "&SurveyID=" + s.getSurveyId();
-        url += "&ResponseID=" + responseSetId;
+        WSRequestHolder survey = QualtricsAPI.request("getLegacyResponseData")
+                .setQueryParameter("Format", "JSON")
+                .setQueryParameter("SurveyID", s.getSurveyId())
+                .setQueryParameter("ResponseID", responseSetId)
+                .setQueryParameter("ExportQuestionIDs", "1");
 
         SurveyResponse x = new SurveyResponse();
         x.patientId = s.getMedicalId();
         x.surveyId = s.getSurveyId();
 
-        final Promise<Result> resultPromise = WS.url(url).get().map(
+        final Promise<Result> resultPromise = survey.get().map(
                 new Function<WSResponse, Result>() {
                     public Result apply(WSResponse response) {
                         x.data = response.asJson();
                         x.insert();
-                        return ok(Json.toJson(s));
+                        return ok(Json.toJson(x));
                     }
                 }
         );
