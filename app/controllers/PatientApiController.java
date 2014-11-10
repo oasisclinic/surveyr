@@ -1,19 +1,13 @@
 package controllers;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import com.wordnik.swagger.annotations.*;
 import models.Patient;
-import models.SurveyResponse;
 import play.data.Form;
-import play.data.validation.Validation;
-import play.libs.Json;
 import play.mvc.BodyParser;
 import play.mvc.Result;
 
 import javax.ws.rs.Consumes;
-import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
-import java.util.Date;
 import java.util.List;
 
 @Api(value = "/api/patients", description = "Operations involving patients")

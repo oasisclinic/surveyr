@@ -13,7 +13,9 @@ GET     /ram   controllers.Application.ram()
 OPTIONS /api/*wholepath                 controllers.BaseApiController.options(wholepath)
 GET     /api/surveyResponses/:surveyId/:patientId        controllers.SurveyResponseApiController.findByPatientId(surveyId, patientId)
 POST    /api/patients/create            controllers.PatientApiController.create()
-#GET     /api/patients/findAll           controllers.PatientApiController.findAll()
+GET     /api/patients/findAll           controllers.PatientApiController.findAll()
+
+GET     /api/surveys/findAll            controllers.SurveyApiController.findAll()
 
 # API documentation
 OPTIONS /api-docs/*wholepath             controllers.BaseApiController.options(wholepath)

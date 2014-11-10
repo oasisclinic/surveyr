@@ -16,6 +16,7 @@ public abstract class QualtricsAPI {
     private static final String API_TOKEN = conf.getString("qualtrics.api.token");
     private static final String API_VERSION = conf.getString("qualtrics.api.version");
     private static final Integer API_REQUEST_TIMEOUT = conf.getInt("qualtrics.api.requestTimeout");
+    private static final String SURVEY_BASE_URL = conf.getString("qualtrics.survey.baseUrl");
 
     public static WSRequestHolder request(String requestName) {
 
@@ -28,11 +29,11 @@ public abstract class QualtricsAPI {
 
     }
 
-    public static void combine(JsonNode surveyResponse, Document survey) {
+    public static String createSurveyUrl(String surveyId, String patientId) {
 
-        NodeList questions = survey.getElementsByTagName("Questions");
-
-
+        return SURVEY_BASE_URL
+            + "SID=" + surveyId
+            + "&requestId=" + patientId;
 
     }
 }
