@@ -14,10 +14,11 @@ GET     /api/surveys/requests/findIncomplete            controllers.SurveyApiCon
 GET     /api/surveys/responses/:surveyId/:patientId     controllers.SurveyApiController.findByPatientId(surveyId, patientId)
 
 # API documentation
-OPTIONS /api-docs/*wholepath             controllers.BaseApiController.options(wholepath)
-GET     /api-docs/patients               controllers.ApiHelpController.getResource(path = "/api/patients")
-GET     /api-docs/surveys                controllers.ApiHelpController.getResource(path = "/api/surveys")
-GET     /api-docs/surveyResponses        controllers.ApiHelpController.getResource(path = "/api/surveyResponses")
+OPTIONS /api/explore/*wholepath             controllers.BaseApiController.options(wholepath)
+GET     /api/explore/patients               controllers.ApiHelpController.getResource(path = "/api/patients")
+GET     /api/explore/surveys                controllers.ApiHelpController.getResource(path = "/api/surveys")
+GET     /api/explore/surveyResponses        controllers.ApiHelpController.getResource(path = "/api/surveyResponses")
 
 # Map static resources from the /public folder to the /assets URL path
 GET     /assets/*file               controllers.Assets.at(path="/public", file)
+GET     /api/explore/*file          controllers.Assets.at(path="/public/swagger-ui", file)

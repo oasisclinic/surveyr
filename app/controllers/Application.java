@@ -1,29 +1,12 @@
 package controllers;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import models.*;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-import play.libs.Json;
-import play.libs.XML;
-import play.libs.ws.WSRequestHolder;
-import play.libs.ws.WSResponse;
 import play.mvc.Controller;
-import play.mvc.Result;
-import views.html.index;
-
-import java.util.*;
-
-import static play.libs.F.Function;
-import static play.libs.F.Promise;
 
 public class Application extends Controller {
 
-    public static Result index() {
-        return ok(index.render("Your new application is ready."));
-    }
+//    public static Result index() {
+//        return ok(index.render("Your new application is ready."));
+//    }
 
 //    public static Result takeDemoSurvey() {
 //
