@@ -3,8 +3,14 @@ package controllers;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.wordnik.swagger.annotations.*;
 import models.*;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+import play.Logger;
 import play.libs.F;
 import play.libs.Json;
+import play.libs.XML;
 import play.libs.ws.WSRequestHolder;
 import play.libs.ws.WSResponse;
 import play.mvc.Controller;
@@ -12,10 +18,9 @@ import play.mvc.Result;
 
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.UUID;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.*;
 import java.util.function.Function;
 
 import static controllers.BaseApiController.JsonResponse;
@@ -151,6 +156,81 @@ public class SurveyApiController {
         } else {
             return JsonResponse(404, requests);
         }
+
+    }
+
+    @ApiOperation(nickname="findByPatientId", value = "Retrieve all responses for a single user and survey", httpMethod = "GET", response = PatientSurveyHistoryDTO.class)
+    @ApiResponses(value = {@ApiResponse(code = 200, message = "Surveys found")})
+    public static F.Promise<Result> findByPatientId(@ApiParam(name = "surveyId", value = "the ID of the survey", required = true)
+                                                        @PathParam("surveyId") String surveyId,
+                                                    @ApiParam(name = "patientId", value = "the ID of the patient", required = true)
+                                                    @PathParam("patientId") String patientId) {
+
+        WSRequestHolder surveyDef = QualtricsAPI.request("getSurvey").setQueryParameter("SurveyID", surveyId);
+
+        List<SurveyResponse> responses = SurveyResponse.findByPatientId(surveyId, patientId);
+
+
+        F.Promise<Result> results = F.Promise.sequence(surveyDef.get()).map(
+                list -> {
+
+                    Document d = XML.fromString(list.get(0).getBody());
+
+                    PatientSurveyHistoryDTO psh = new PatientSurveyHistoryDTO(surveyId, patientId);
+
+                    //Logger.debug("responses found: " + responses.size());
+
+                    for (SurveyResponse r : responses) {
+
+                        String testDate = r.data.findValuesAsText("EndDate").get(0);
+                        DateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                        Date date = formatter.parse(testDate);
+
+                        SurveyDataDTO dataDTO = new SurveyDataDTO(date);
+
+                        HashMap<String, String> q = new HashMap<>();
+
+                        //Logger.info(Json.toJson(r.data).toString());
+
+                        Iterator<Map.Entry<String, JsonNode>> it = r.data.get(r.data.fieldNames().next()).fields();
+                        int i = 0;
+                        while(it.hasNext()) {
+
+                            Map.Entry<String, JsonNode> o = it.next();
+                            if (o.getKey().matches("[Q][I][D]\\d") || o.getKey().matches("[Q][I][D]\\d[_]\\d")) {
+
+                                dataDTO.addData(String.valueOf(i), o.getValue().asInt());
+                                Logger.debug("added " + i + ", " + o.getValue().asInt());
+
+                                NodeList l = d.getElementsByTagName("Questions").item(0).getChildNodes();
+                                for (int z = 0; z < l.getLength(); z++) {
+
+                                    Node node = l.item(z);
+                                    Element e = (Element) node;
+                                    if (o.getKey().contains(e.getAttribute("QuestionID"))) {
+
+                                        q.put(String.valueOf(i), e.getElementsByTagName("QuestionDescription").item(0).getTextContent());
+
+                                    }
+
+                                }
+
+                                i++;
+                            }
+
+
+                        }
+
+                        psh.setDefinition(q);
+                        psh.addData(dataDTO);
+
+                    }
+
+                    return JsonResponse(psh);
+                }
+        );
+
+        return results;
 
     }
 

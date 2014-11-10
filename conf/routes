@@ -2,24 +2,16 @@
 # This file defines all application routes (Higher priority routes first)
 # ~~~~
 
-# Home page
-#GET     /                           controllers.Application.index()
-#GET     /demo/begin                 controllers.Application.takeDemoSurvey()
-#GET     /demo/complete/:requestId/:responseSetId              controllers.Application.completeDemoSurvey(requestId: String, responseSetId: String)
-#GET     /ram   controllers.Application.ram()
-
-
 # API
 OPTIONS /api/*wholepath                 controllers.BaseApiController.options(wholepath)
-GET     /api/surveyResponses/:surveyId/:patientId        controllers.SurveyResponseApiController.findByPatientId(surveyId, patientId)
 POST    /api/patients/create            controllers.PatientApiController.create()
 GET     /api/patients/findAll           controllers.PatientApiController.findAll()
-
 GET     /api/surveys/findAll                            controllers.SurveyApiController.findAll()
 GET     /api/surveys/start/:surveyId/:patientId         controllers.SurveyApiController.administerSurvey(surveyId, patientId)
 GET     /api/surveys/complete/:requestId/:responseId    controllers.SurveyApiController.completeSurvey(requestId, responseId)
 GET     /api/surveys/requests/findAll                   controllers.SurveyApiController.findAllResponseRequests()
 GET     /api/surveys/requests/findIncomplete            controllers.SurveyApiController.findAllIncompleteResponseRequests()
+GET     /api/surveys/responses/:surveyId/:patientId     controllers.SurveyApiController.findByPatientId(surveyId, patientId)
 
 # API documentation
 OPTIONS /api-docs/*wholepath             controllers.BaseApiController.options(wholepath)
