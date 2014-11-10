@@ -12,7 +12,7 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import play.Logger;
-import play.libs.F;
+import play.libs.F.*;
 import play.libs.Json;
 import play.libs.XML;
 import play.libs.ws.WSRequestHolder;
@@ -28,15 +28,14 @@ public class SurveyResponseApiController extends BaseApiController {
 
     @ApiOperation(nickname="findByPatientId", value = "Add a new pet to the store", httpMethod = "GET", responseContainer = "List", response = SurveyResponse.class)
     @ApiResponses(value = {@ApiResponse(code = 405, message = "Invalid input")})
-    public static F.Promise<Result> findByPatientId(@PathParam("surveyId") String surveyId, @PathParam("patientId") String patientId) {
+    public static Promise<Result> findByPatientId(@PathParam("surveyId") String surveyId, @PathParam("patientId") String patientId) {
 
-        WSRequestHolder surveyDef = QualtricsAPI.request("getSurvey")
-                .setQueryParameter("SurveyID", surveyId);
+        WSRequestHolder surveyDef = QualtricsAPI.request("getSurvey").setQueryParameter("SurveyID", surveyId);
 
         List<SurveyResponse> responses = SurveyResponse.findByPatientId(surveyId, patientId);
 
 
-        F.Promise<Result> results = F.Promise.sequence(surveyDef.get()).map(
+        Promise<Result> results = Promise.sequence(surveyDef.get()).map(
                 list -> {
 
                     Document d = XML.fromString(list.get(0).getBody());
