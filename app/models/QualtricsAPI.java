@@ -1,12 +1,9 @@
 package models;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import org.json4s.Xml;
-import org.w3c.dom.Document;
-import org.w3c.dom.NodeList;
 import play.Configuration;
 import play.Play;
-import play.libs.ws.*;
+import play.libs.ws.WS;
+import play.libs.ws.WSRequestHolder;
 
 public abstract class QualtricsAPI {
 

@@ -9,6 +9,7 @@ import play.mvc.Result;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.Produces;
 import java.util.List;
+import java.util.UUID;
 
 @Api(value = "/api/patients", description = "Operations involving patients")
 public class PatientApiController extends BaseApiController {
@@ -26,6 +27,7 @@ public class PatientApiController extends BaseApiController {
             return JsonResponse(400, form.errorsAsJson());
         } else {
             Patient patient = form.get();
+            patient.setPatientId(UUID.randomUUID());
             patient.save();
             return JsonResponse(201, patient);
         }

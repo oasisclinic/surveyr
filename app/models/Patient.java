@@ -9,10 +9,7 @@ import org.jongo.MongoCollection;
 import play.data.validation.Constraints.*;
 import uk.co.panaxiom.playjongo.PlayJongo;
 
-import java.util.Date;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 
 @ApiModel(value = "A patient is a client of the clinic")
 public class Patient {
@@ -22,6 +19,9 @@ public class Patient {
 
     @JsonProperty("_id")
     private ObjectId _id;
+
+    @ApiModelProperty(value = "a unique identifier for a patient", required = false)
+    private String patientId;
 
     @Required(message = "You must provide the medical ID of the patient")
     @ApiModelProperty(value = "the UNC medical ID of the patient", required = true)
@@ -50,8 +50,8 @@ public class Patient {
         return patients;
     }
 
-    public static Patient findOne(String id) {
-        return collection.findOne("{_id: #}", id).as(Patient.class);
+    public static Patient findOne(String patientId) {
+        return collection.findOne("{patientId: #}", patientId).as(Patient.class);
     }
 
     public String getMedicalId() {
@@ -78,16 +78,20 @@ public class Patient {
         this.lastName = lastName;
     }
 
-    public static MongoCollection getCollection() {
-        return collection;
-    }
-
     public Date getLastVisit() {
         return lastVisit;
     }
 
     public void setLastVisit(Date lastVisit) {
         this.lastVisit = lastVisit;
+    }
+
+    public String getPatientId() {
+        return patientId;
+    }
+
+    public void setPatientId(UUID patientId) {
+        this.patientId = patientId.toString();
     }
 
 }
