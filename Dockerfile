@@ -7,8 +7,8 @@ ENV PATH $PATH:/tmp/activator-$ACTIVATOR_VERSION
 
 WORKDIR /tmp
 
-#ADD http://downloads.typesafe.com/typesafe-activator/$ACTIVATOR_VERSION/typesafe-activator-$ACTIVATOR_VERSION.zip /tmp/activator.zip
-ADD /activator.zip /tmp/activator.zip
+ADD http://downloads.typesafe.com/typesafe-activator/$ACTIVATOR_VERSION/typesafe-activator-$ACTIVATOR_VERSION.zip /tmp/activator.zip
+#ADD /activator.zip /tmp/activator.zip
 RUN unzip /tmp/activator.zip
 
 ADD https://github.com/oasisclinic/database/archive/master.zip /tmp/master.zip
@@ -22,5 +22,7 @@ RUN ["activator", "clean", "stage"]
 
 RUN mkdir /app
 RUN mv /tmp/database-master/target/universal/stage/ /app/
+RUN rm -rf /tmp
 
-CMD ["/app/stage/bin/play-java", "-Dapplication.secret=or7_xe;JHTm4@OS`cjh/PM4=7okeqi8h^Bba0_;NiPJSvijKH^:Q>03Qygq^`W9V"]
+WORKDIR /app/stage
+ENTRYPOINT ["/app/stage/bin/oasis-database", "-Dapplication.secret=or7_xe;JHTm4@OS`cjh/PM4=7okeqi8h^Bba0_;NiPJSvijKH^:Q>03Qygq^`W9V"]
