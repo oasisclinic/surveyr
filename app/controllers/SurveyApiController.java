@@ -41,7 +41,7 @@ public class SurveyApiController {
         WSRequestHolder surveys = QualtricsAPI.request("getSurveys")
                 .setQueryParameter("Format", "JSON");
 
-        F.Promise<Result> surveysPromise = surveys.get().map(
+        return surveys.get().map(
                 new F.Function<WSResponse, Result>() {
                     public Result apply(WSResponse response) {
                         List<SurveyDTO> surveys = new LinkedList<>();
@@ -59,8 +59,6 @@ public class SurveyApiController {
                     }
                 }
         );
-
-        return surveysPromise;
 
     }
 
@@ -109,7 +107,7 @@ public class SurveyApiController {
         response.patientId = request.getPatientId();
         response.surveyId = request.getSurveyId();
 
-        F.Promise<Result> responsePromise = surveyAnswers.get().map(
+        return surveyAnswers.get().map(
                 new F.Function<WSResponse, Result>() {
                     public Result apply(WSResponse w) {
                         response.data = w.asJson();
@@ -118,8 +116,6 @@ public class SurveyApiController {
                     }
                 }
         );
-
-        return responsePromise;
 
     }
 
@@ -171,7 +167,7 @@ public class SurveyApiController {
         List<SurveyResponse> responses = SurveyResponse.findByPatientId(surveyId, patientId);
 
 
-        F.Promise<Result> results = F.Promise.sequence(surveyDef.get()).map(
+        return F.Promise.sequence(surveyDef.get()).map(
                 list -> {
 
                     Document d = XML.fromString(list.get(0).getBody());
@@ -229,8 +225,6 @@ public class SurveyApiController {
                     return JsonResponse(psh);
                 }
         );
-
-        return results;
 
     }
 
