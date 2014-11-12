@@ -7,14 +7,16 @@ import play.mvc.BodyParser;
 import play.mvc.Result;
 
 import javax.ws.rs.Consumes;
+import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
 @Api(value = "/api/patients", description = "Operations involving patients")
 public class PatientApiController extends BaseApiController {
 
-    @ApiOperation(nickname="create", value = "Create a patient record", httpMethod = "POST", response = Patient.class)
+    @ApiOperation(nickname = "create", value = "Create a patient record", httpMethod = "POST", response = Patient.class)
     @ApiResponses(value = {@ApiResponse(code = 201, message = "New patient successfully created")})
     @ApiImplicitParams(value = {@ApiImplicitParam(value = "Patient object to create", name = "body", required = true, paramType = "body", dataType = "Patient")})
     @Consumes("application/json")
@@ -28,26 +30,26 @@ public class PatientApiController extends BaseApiController {
         } else {
             Patient patient = form.get();
             patient.setPatientId(UUID.randomUUID());
+            patient.setLastInteraction(new Date());
             patient.save();
             return JsonResponse(201, patient);
         }
 
     }
 
-    @ApiOperation(nickname="findAll", value = "Get all patient records", httpMethod = "GET", responseContainer = "List", response = Patient.class)
+    @ApiOperation(nickname = "findAny", value = "Get patient records", httpMethod = "GET", responseContainer = "List", response = Patient.class)
     @ApiResponses(value = {
-            @ApiResponse(code = 200, message = "Patient records found"),
-            @ApiResponse(code = 404, message = "No patient records found")
+            @ApiResponse(code = 200, message = "Patient records found")
     })
     @Produces("application/json")
-    public static Result findAll() {
-
-        List<Patient> patients = Patient.findAll();
-
-        if (patients.size() > 0) {
-            return JsonResponse(200, patients);
+    public static Result findAny(@ApiParam(name = "limit", value = "the number of patients to return", required = false)
+                                 @PathParam("limit") Integer limit) {
+        if (limit < -1) {
+            return JsonResponse(400, "limit must be greater than or equal to -1");
+        } else if (limit == -1) {
+            return JsonResponse(Patient.findAll());
         } else {
-            return JsonResponse(404, patients);
+            return JsonResponse(Patient.findMostRecent(limit));
         }
 
     }

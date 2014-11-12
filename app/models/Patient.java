@@ -35,19 +35,20 @@ public class Patient {
     @ApiModelProperty(value = "the legal surname of the patient", required = true)
     private String lastName;
 
-    @ApiModelProperty(value = "the date of the patient's last visit to the clinic", required = false)
-    private Date lastVisit;
+    @ApiModelProperty(value = "the date of the last interaction regarding the patient", required = false)
+    private Date lastInteraction;
 
     public Patient save() {
         collection.save(this);
         return this;
     }
 
+    public static List<Patient> findMostRecent(Integer limit) {
+        return new MongoList<Patient>(collection.find().limit(limit).sort("{lastInteraction: -1}"), Patient.class).getList();
+    }
+
     public static List<Patient> findAll() {
-        List<Patient> patients = new LinkedList<>();
-        Iterator<Patient> it = collection.find().as(Patient.class).iterator();
-        while(it.hasNext()) patients.add(it.next());
-        return patients;
+        return new MongoList<Patient>(collection.find(), Patient.class).getList();
     }
 
     public static Patient findOne(String patientId) {
@@ -78,14 +79,6 @@ public class Patient {
         this.lastName = lastName;
     }
 
-    public Date getLastVisit() {
-        return lastVisit;
-    }
-
-    public void setLastVisit(Date lastVisit) {
-        this.lastVisit = lastVisit;
-    }
-
     public String getPatientId() {
         return patientId;
     }
@@ -94,4 +87,11 @@ public class Patient {
         this.patientId = patientId.toString();
     }
 
+    public Date getLastInteraction() {
+        return lastInteraction;
+    }
+
+    public void setLastInteraction(Date lastInteraction) {
+        this.lastInteraction = lastInteraction;
+    }
 }

@@ -5,7 +5,7 @@
 # API
 OPTIONS /api/*wholepath                 controllers.BaseApiController.options(wholepath)
 POST    /api/patients/create            controllers.PatientApiController.create()
-GET     /api/patients/findAll           controllers.PatientApiController.findAll()
+GET     /api/patients/find/any          controllers.PatientApiController.findAny(limit: Int ?= -1)
 GET     /api/surveys/findAll                            controllers.SurveyApiController.findAll()
 GET     /api/surveys/start/:surveyId/:patientId         controllers.SurveyApiController.administerSurvey(surveyId, patientId)
 GET     /api/surveys/complete/:requestId/:responseId    controllers.SurveyApiController.completeSurvey(requestId, responseId)

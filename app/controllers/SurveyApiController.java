@@ -9,11 +9,8 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import play.Logger;
 import play.libs.F;
-import play.libs.Json;
 import play.libs.XML;
 import play.libs.ws.WSRequestHolder;
-import play.libs.ws.WSResponse;
-import play.mvc.Controller;
 import play.mvc.Result;
 
 import javax.ws.rs.PathParam;
@@ -21,16 +18,14 @@ import javax.ws.rs.Produces;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
-import java.util.function.Function;
 
 import static controllers.BaseApiController.JsonResponse;
-import static play.mvc.Results.ok;
 import static play.mvc.Results.redirect;
 
 @Api(value = "/api/surveys", description = "Operations involving surveys")
 public class SurveyApiController {
 
-    @ApiOperation(nickname="findAll", value = "Get a list of available surveys", httpMethod = "GET", response = SurveyDTO.class)
+    @ApiOperation(nickname = "findAll", value = "Get a list of available surveys", httpMethod = "GET", response = SurveyDTO.class)
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Surveys found"),
             @ApiResponse(code = 404, message = "No surveys found")
@@ -38,24 +33,21 @@ public class SurveyApiController {
     @Produces("application/json")
     public static F.Promise<Result> findAll() {
 
-        WSRequestHolder surveys = QualtricsAPI.request("getSurveys")
+        WSRequestHolder surveysRequest = QualtricsAPI.request("getSurveys")
                 .setQueryParameter("Format", "JSON");
 
-        return surveys.get().map(
-                new F.Function<WSResponse, Result>() {
-                    public Result apply(WSResponse response) {
-                        List<SurveyDTO> surveys = new LinkedList<>();
-                        JsonNode node = response.asJson().with("Result").withArray("Surveys");
-                        Iterator<JsonNode> it = node.elements();
-                        while (it.hasNext()) {
-                            JsonNode n = it.next();
-                            surveys.add(new SurveyDTO(n.get("SurveyID").asText(), n.get("SurveyName").asText()));
-                        }
-                        if (surveys.size() > 0) {
-                            return JsonResponse(200, surveys);
-                        } else {
-                            return JsonResponse(404, surveys);
-                        }
+        return surveysRequest.get().map(response -> {
+                    List<SurveyDTO> surveys = new LinkedList<>();
+                    JsonNode node = response.asJson().with("Result").withArray("Surveys");
+                    Iterator<JsonNode> it = node.elements();
+                    while (it.hasNext()) {
+                        JsonNode n = it.next();
+                        surveys.add(new SurveyDTO(n.get("SurveyID").asText(), n.get("SurveyName").asText()));
+                    }
+                    if (surveys.size() > 0) {
+                        return JsonResponse(200, surveys);
+                    } else {
+                        return JsonResponse(404, surveys);
                     }
                 }
         );
@@ -88,14 +80,18 @@ public class SurveyApiController {
             @ApiResponse(code = 200, message = "Survey response recorded")
     })
     public static F.Promise<Result> completeSurvey(@ApiParam(name = "requestId", value = "the ID of the survey request", required = true)
-                                          @PathParam("requestId") String requestId,
-                                          @ApiParam(name = "responseId", value = "the Qualtrics-provided response ID", required = true)
-                                          @PathParam("responseId") String responseId) {
+                                                   @PathParam("requestId") String requestId,
+                                                   @ApiParam(name = "responseId", value = "the Qualtrics-provided response ID", required = true)
+                                                   @PathParam("responseId") String responseId) {
 
         SurveyResponseRequest request = SurveyResponseRequest.findOne(requestId);
         request.setResponseId(responseId);
         request.setComplete(true);
         request.save();
+
+        Patient patient = Patient.findOne(request.getPatientId());
+        patient.setLastInteraction(new Date());
+        patient.save();
 
         WSRequestHolder surveyAnswers = QualtricsAPI.request("getLegacyResponseData")
                 .setQueryParameter("Format", "JSON")
@@ -107,19 +103,16 @@ public class SurveyApiController {
         response.patientId = request.getPatientId();
         response.surveyId = request.getSurveyId();
 
-        return surveyAnswers.get().map(
-                new F.Function<WSResponse, Result>() {
-                    public Result apply(WSResponse w) {
-                        response.data = w.asJson();
-                        response.insert();
-                        return JsonResponse(200, response);
-                    }
+        return surveyAnswers.get().map(w -> {
+                    response.data = w.asJson();
+                    response.insert();
+                    return JsonResponse(200, response);
                 }
         );
 
     }
 
-    @ApiOperation(nickname="findAllResponseRequests", value = "Get all survey response requests", httpMethod = "GET", responseContainer = "List", response = SurveyResponseRequest.class)
+    @ApiOperation(nickname = "findAllResponseRequests", value = "Get all survey response requests", httpMethod = "GET", responseContainer = "List", response = SurveyResponseRequest.class)
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Requests found"),
             @ApiResponse(code = 404, message = "No requests found")
@@ -137,7 +130,7 @@ public class SurveyApiController {
 
     }
 
-    @ApiOperation(nickname="findAllIncompleteResponseRequests", value = "Get all survey response requests that have yet to be completed", httpMethod = "GET", responseContainer = "List", response = SurveyResponseRequest.class)
+    @ApiOperation(nickname = "findAllIncompleteResponseRequests", value = "Get all survey response requests that have yet to be completed", httpMethod = "GET", responseContainer = "List", response = SurveyResponseRequest.class)
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Incomplete requests found"),
             @ApiResponse(code = 404, message = "No incomplete requests found")
@@ -155,10 +148,10 @@ public class SurveyApiController {
 
     }
 
-    @ApiOperation(nickname="findByPatientId", value = "Retrieve all responses for a single user and survey", httpMethod = "GET", response = PatientSurveyHistoryDTO.class)
+    @ApiOperation(nickname = "findByPatientId", value = "Retrieve all responses for a single user and survey", httpMethod = "GET", response = PatientSurveyHistoryDTO.class)
     @ApiResponses(value = {@ApiResponse(code = 200, message = "Surveys found")})
     public static F.Promise<Result> findByPatientId(@ApiParam(name = "surveyId", value = "the ID of the survey", required = true)
-                                                        @PathParam("surveyId") String surveyId,
+                                                    @PathParam("surveyId") String surveyId,
                                                     @ApiParam(name = "patientId", value = "the ID of the patient", required = true)
                                                     @PathParam("patientId") String patientId) {
 
@@ -166,15 +159,11 @@ public class SurveyApiController {
 
         List<SurveyResponse> responses = SurveyResponse.findByPatientId(surveyId, patientId);
 
+        return surveyDef.get().map(response -> {
 
-        return F.Promise.sequence(surveyDef.get()).map(
-                list -> {
+                    Document d = XML.fromString(response.getBody());
 
-                    Document d = XML.fromString(list.get(0).getBody());
-
-                    PatientSurveyHistoryDTO psh = new PatientSurveyHistoryDTO(surveyId, patientId);
-
-                    //Logger.debug("responses found: " + responses.size());
+                    PatientSurveyHistoryDTO psh = new PatientSurveyHistoryDTO();
 
                     for (SurveyResponse r : responses) {
 
@@ -186,17 +175,14 @@ public class SurveyApiController {
 
                         HashMap<String, String> q = new HashMap<>();
 
-                        //Logger.info(Json.toJson(r.data).toString());
-
                         Iterator<Map.Entry<String, JsonNode>> it = r.data.get(r.data.fieldNames().next()).fields();
                         int i = 0;
-                        while(it.hasNext()) {
+                        while (it.hasNext()) {
 
                             Map.Entry<String, JsonNode> o = it.next();
                             if (o.getKey().matches("[Q][I][D]\\d") || o.getKey().matches("[Q][I][D]\\d[_]\\d")) {
 
                                 dataDTO.addData(String.valueOf(i), o.getValue().asInt());
-                                Logger.debug("added " + i + ", " + o.getValue().asInt());
 
                                 NodeList l = d.getElementsByTagName("Questions").item(0).getChildNodes();
                                 for (int z = 0; z < l.getLength(); z++) {
@@ -227,6 +213,5 @@ public class SurveyApiController {
         );
 
     }
-
 
 }
