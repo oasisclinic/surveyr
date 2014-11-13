@@ -58,20 +58,22 @@ public class SurveyApiController {
     @ApiResponses(value = {
             @ApiResponse(code = 302, message = "Administration started")
     })
-    public static Result administerSurvey(@ApiParam(name = "surveyId", value = "the Qualtrics survey ID to administer", required = true)
+    public static F.Promise<Result> administerSurvey(@ApiParam(name = "surveyId", value = "the Qualtrics survey ID to administer", required = true)
                                           @PathParam("surveyId") String surveyId,
                                           @ApiParam(name = "patientId", value = "the ID of the patient to administer a survey to", required = true)
                                           @PathParam("patientId") String patientId) {
 
-        UUID requestId = UUID.randomUUID();
+        WSRequestHolder getSurveyName = QualtricsAPI.request("getSurveyName")
+                .setQueryParameter("Format", "JSON")
+                .setQueryParameter("SurveyID", surveyId);
 
-        SurveyResponseRequest request = new SurveyResponseRequest();
-        request.setPatientId(patientId);
-        request.setSurveyId(surveyId);
-        request.setRequestId(requestId);
-        request.save();
-
-        return redirect(QualtricsAPI.createSurveyUrl(surveyId, requestId.toString()));
+        return getSurveyName.get().map(response -> {
+                    String surveyName = response.asJson().with("Result").get("SurveyName").asText();
+                    String requestId = UUID.randomUUID().toString();
+                    SurveyResponseRequest request = new SurveyResponseRequest(requestId, patientId, surveyId, surveyName, new Date()).save();
+                    return redirect(QualtricsAPI.createSurveyUrl(surveyId, requestId));
+                }
+        );
 
     }
 
@@ -127,6 +129,18 @@ public class SurveyApiController {
         } else {
             return JsonResponse(404, requests);
         }
+
+    }
+
+    @ApiOperation(nickname = "findResponseRequestsByPatient", value = "Get all surveys that a patient has started", httpMethod = "GET", responseContainer = "List", response = SurveyResponseRequest.class)
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "Requests found")
+    })
+    @Produces("application/json")
+    public static Result findCompletedResponseRequestsByPatient(@ApiParam(name = "patientId", value = "patientId", required = true)
+                                                       @PathParam("patientId") String patientId) {
+
+        return JsonResponse(SurveyResponseRequest.findCompletedByPatientId(patientId));
 
     }
 

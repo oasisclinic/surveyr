@@ -37,12 +37,12 @@ public class PatientApiController extends BaseApiController {
 
     }
 
-    @ApiOperation(nickname = "findAny", value = "Get patient records", httpMethod = "GET", responseContainer = "List", response = Patient.class)
+    @ApiOperation(nickname = "findAll", value = "Get patient records", httpMethod = "GET", responseContainer = "List", response = Patient.class)
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Patient records found")
     })
     @Produces("application/json")
-    public static Result findAny(@ApiParam(name = "limit", value = "the number of patients to return", required = false)
+    public static Result findAll(@ApiParam(name = "limit", value = "the number of patients to return", required = false)
                                  @PathParam("limit") Integer limit) {
         if (limit < -1) {
             return JsonResponse(400, "limit must be greater than or equal to -1");
@@ -51,6 +51,18 @@ public class PatientApiController extends BaseApiController {
         } else {
             return JsonResponse(Patient.findMostRecent(limit));
         }
+
+    }
+
+    @ApiOperation(nickname = "findById", value = "Get patient information", httpMethod = "GET", response = Patient.class)
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "Patient found")
+    })
+    @Produces("application/json")
+    public static Result findById(@ApiParam(name = "patientId", value = "patientId", required = true)
+                                  @PathParam("patientId") String patientId) {
+        Patient patient = Patient.findOne(patientId);
+        return JsonResponse(patient == null ? 404 : 200, patient);
 
     }
 

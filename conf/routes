@@ -3,14 +3,24 @@
 # ~~~~
 
 # API
-OPTIONS /api/*wholepath                 controllers.BaseApiController.options(wholepath)
-POST    /api/patients/create            controllers.PatientApiController.create()
-GET     /api/patients/find/any          controllers.PatientApiController.findAny(limit: Int ?= -1)
+
+OPTIONS /api/*wholepath                                 controllers.BaseApiController.options(wholepath)
+
 GET     /api/surveys/findAll                            controllers.SurveyApiController.findAll()
 GET     /api/surveys/start/:surveyId/:patientId         controllers.SurveyApiController.administerSurvey(surveyId, patientId)
 GET     /api/surveys/complete/:requestId/:responseId    controllers.SurveyApiController.completeSurvey(requestId, responseId)
-GET     /api/surveys/requests/findAll                   controllers.SurveyApiController.findAllResponseRequests()
-GET     /api/surveys/requests/findIncomplete            controllers.SurveyApiController.findAllIncompleteResponseRequests()
+
+# Patients
+POST    /api/patients/create                            controllers.PatientApiController.create()
+GET     /api/patients/find/all                          controllers.PatientApiController.findAll(limit: Int ?= -1)
+GET     /api/patients/:patientId                        controllers.PatientApiController.findById(patientId)
+
+# Survey administration requests
+GET     /api/surveys/requests/find/all                  controllers.SurveyApiController.findAllResponseRequests()
+GET     /api/surveys/requests/find/incomplete           controllers.SurveyApiController.findAllIncompleteResponseRequests()
+GET     /api/surveys/requests/completed/:patientId      controllers.SurveyApiController.findCompletedResponseRequestsByPatient(patientId)
+
+# Survey responses
 GET     /api/surveys/responses/:surveyId/:patientId     controllers.SurveyApiController.findByPatientId(surveyId, patientId)
 
 # API documentation

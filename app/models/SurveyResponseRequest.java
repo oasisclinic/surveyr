@@ -29,6 +29,10 @@ public class SurveyResponseRequest {
     @ApiModelProperty(value = "the ID of the Qualtrics survey in progress", required = true)
     private String surveyId;
 
+    @Constraints.Required
+    @ApiModelProperty(value = "the name of the Qualtrics survey in progress", required = true)
+    private String surveyName;
+
     @ApiModelProperty(value = "the Qualtrics-provided response ID", required = false)
     private String responseId;
 
@@ -36,23 +40,35 @@ public class SurveyResponseRequest {
     @ApiModelProperty(value = "indicates whether the request has been completed", required = true)
     private boolean complete;
 
+    @Constraints.Required
+    @ApiModelProperty(value = "the date the response request was made", required = true)
+    private Date startDate;
+
+    public SurveyResponseRequest(){}
+
+    public SurveyResponseRequest(String requestId, String patientId, String surveyId, String surveyName, Date startDate) {
+        this.requestId = requestId;
+        this.patientId = patientId;
+        this.surveyId = surveyId;
+        this.surveyName = surveyName;
+        this.startDate = startDate;
+    }
+
     public SurveyResponseRequest save() {
         collection.save(this);
         return this;
     }
 
     public static List<SurveyResponseRequest> findIncomplete() {
-        List<SurveyResponseRequest> requests = new LinkedList<>();
-        Iterator<SurveyResponseRequest> it = collection.find("{complete: #}", false).as(SurveyResponseRequest.class).iterator();
-        while(it.hasNext()) requests.add(it.next());
-        return requests;
+        return new MongoList<SurveyResponseRequest>(collection.find("{complete: #}", false), SurveyResponseRequest.class).getList();
     }
 
     public static List<SurveyResponseRequest> findAll() {
-        List<SurveyResponseRequest> requests = new LinkedList<>();
-        Iterator<SurveyResponseRequest> it = collection.find().as(SurveyResponseRequest.class).iterator();
-        while(it.hasNext()) requests.add(it.next());
-        return requests;
+        return new MongoList<SurveyResponseRequest>(collection.find(), SurveyResponseRequest.class).getList();
+    }
+
+    public static List<SurveyResponseRequest> findCompletedByPatientId(String patientId) {
+        return new MongoList<SurveyResponseRequest>(collection.find("{patientId: #, complete: true}", patientId), SurveyResponseRequest.class).getList();
     }
 
     public static SurveyResponseRequest findOne(String requestId) {
@@ -105,4 +121,23 @@ public class SurveyResponseRequest {
         this.responseId = responseId;
     }
 
+    public Date getStartDate() {
+        return startDate;
+    }
+
+    public void setStartDate(Date startDate) {
+        this.startDate = startDate;
+    }
+
+    public String getSurveyName() {
+        return surveyName;
+    }
+
+    public void setSurveyName(String surveyName) {
+        this.surveyName = surveyName;
+    }
+
+    public void setRequestId(String requestId) {
+        this.requestId = requestId;
+    }
 }
