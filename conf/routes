@@ -1,24 +1,25 @@
 # Routes
 # This file defines all application routes (Higher priority routes first)
-# ~~~~
 
 # API
-
 OPTIONS /api/*wholepath                                 controllers.BaseApiController.options(wholepath)
-
-GET     /api/surveys/findAll                            controllers.SurveyApiController.findAll()
-GET     /api/surveys/start/:surveyId/:patientId         controllers.SurveyApiController.administerSurvey(surveyId, patientId)
-GET     /api/surveys/complete/:requestId/:responseId    controllers.SurveyApiController.completeSurvey(requestId, responseId)
 
 # Patients
 POST    /api/patients/create                            controllers.PatientApiController.create()
 GET     /api/patients/find/all                          controllers.PatientApiController.findAll(limit: Int ?= -1)
 GET     /api/patients/:patientId                        controllers.PatientApiController.findById(patientId)
 
-# Survey administration requests
+# Survey administration
+GET     /api/surveys/start/:surveyId/:patientId         controllers.SurveyApiController.administerSurvey(surveyId, patientId)
+GET     /api/surveys/complete/:requestId/:responseId    controllers.SurveyApiController.completeSurvey(requestId, responseId)
+
+# Survey history
 GET     /api/surveys/requests/find/all                  controllers.SurveyApiController.findAllResponseRequests()
 GET     /api/surveys/requests/find/incomplete           controllers.SurveyApiController.findAllIncompleteResponseRequests()
 GET     /api/surveys/requests/completed/:patientId      controllers.SurveyApiController.findCompletedResponseRequestsByPatient(patientId)
+
+# Surveys
+GET     /api/surveys/findAll                            controllers.SurveyApiController.findAll()
 
 # Survey responses
 GET     /api/surveys/responses/:surveyId/:patientId     controllers.SurveyApiController.findByPatientId(surveyId, patientId)
@@ -28,7 +29,3 @@ OPTIONS /api/explore/*wholepath                         controllers.BaseApiContr
 GET     /api/explore/patients                           controllers.ApiHelpController.getResource(path = "/api/patients")
 GET     /api/explore/surveys                            controllers.ApiHelpController.getResource(path = "/api/surveys")
 GET     /api/explore/surveyResponses                    controllers.ApiHelpController.getResource(path = "/api/surveyResponses")
-
-# Map static resources from the /public folder to the /assets URL path
-GET     /assets/*file                                   controllers.Assets.at(path="/public", file)
-GET     /api/explore/*file                              controllers.Assets.at(path="/public/swagger-ui", file)
