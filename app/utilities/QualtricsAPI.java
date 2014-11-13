@@ -26,11 +26,11 @@ public abstract class QualtricsAPI {
 
     }
 
-    public static String createSurveyUrl(String surveyId, String patientId) {
+    public static String createSurveyUrl(String surveyId, String requestId) {
 
         return SURVEY_BASE_URL
             + "SID=" + surveyId
-            + "&requestId=" + patientId;
+            + "&requestId=" + requestId;
 
     }
 }

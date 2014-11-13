@@ -14,22 +14,8 @@ import play.mvc.Result;
 
 public class BaseApiController extends Controller {
 
-    private static SimpleBeanPropertyFilter filter = SimpleBeanPropertyFilter.serializeAllExcept("_id");
-    private static FilterProvider provider = new SimpleFilterProvider().addFilter("no id", filter);
-    //private static ObjectMapper mapper = JsonUtil.mapper().copy();
-
-    public BaseApiController() {
-        //mapper.setFilters(provider);
-    }
-
     public static Result options(Object wholepath) {
-
-        response().setContentType("application/json");
-        response().setHeader("Access-Control-Allow-Origin", "*");
-        response().setHeader("Access-Control-Allow-Methods", "GET, POST, DELETE, PUT, OPTIONS");
-        response().setHeader("Access-Control-Allow-Headers", "Content-Type, api_key, Authorization");
-        return ok();
-
+        return JsonResponse(null);
     }
 
     public static Result JsonResponse(Object obj) {
@@ -43,16 +29,7 @@ public class BaseApiController extends Controller {
         response().setHeader("Access-Control-Allow-Methods", "GET, POST, DELETE, PUT, OPTIONS");
         response().setHeader("Access-Control-Allow-Headers", "Content-Type, api_key, Authorization");
 
-        ObjectMapper m = new ObjectMapper();
-        //JsonNode n = (obj == null)? null : m.valueToTree(obj);
-        String n = null;
-        try {
-            n = m.writer(new SimpleFilterProvider().addFilter("asdf", SimpleBeanPropertyFilter.serializeAllExcept("firstName"))).writeValueAsString(obj);
-            Logger.info(n);
-        } catch (JsonProcessingException e) {
-            e.printStackTrace();
-        }
-        return status(code, n);
+        return status(code, (obj == null)? null : Json.toJson(obj));
     }
 
 }
