@@ -11,18 +11,18 @@ ADD http://downloads.typesafe.com/typesafe-activator/$ACTIVATOR_VERSION/typesafe
 #ADD /activator.zip /tmp/activator.zip
 RUN unzip /tmp/activator.zip
 
-ADD https://github.com/oasisclinic/database/archive/master.zip /tmp/master.zip
+ADD https://github.com/oasisclinic/surveyor/archive/master.zip /tmp/master.zip
 RUN unzip /tmp/master.zip
 
 EXPOSE 9000
 
-WORKDIR /tmp/database-master
+WORKDIR /tmp/surveyor-master
 
 RUN ["activator", "clean", "stage"]
 
 RUN mkdir /app
-RUN mv /tmp/database-master/target/universal/stage/ /app/
+RUN mv /tmp/surveyor-master/target/universal/stage/ /app/
 RUN rm -rf /tmp
 
 WORKDIR /app/stage
-ENTRYPOINT ["/app/stage/bin/oasis-database", "-Dapplication.secret=or7_xe;JHTm4@OS`cjh/PM4=7okeqi8h^Bba0_;NiPJSvijKH^:Q>03Qygq^`W9V"]
+ENTRYPOINT ["/app/stage/bin/oasis-surveyor", "-Dapplication.secret=or7_xe;JHTm4@OS`cjh/PM4=7okeqi8h^Bba0_;NiPJSvijKH^:Q>03Qygq^`W9V"]

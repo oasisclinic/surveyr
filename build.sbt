@@ -1,6 +1,6 @@
 import play.PlayJava
 
-name := "oasis-database"
+name := "oasis-surveyor"
 
 version := "1.0"
 
