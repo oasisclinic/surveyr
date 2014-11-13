@@ -1,5 +1,6 @@
 package models;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -7,42 +8,64 @@ import org.bson.types.ObjectId;
 import org.jongo.*;
 import play.Logger;
 import uk.co.panaxiom.playjongo.PlayJongo;
+import utilities.MongoList;
 
 import java.util.*;
 
 public class SurveyResponse {
 
-    @JsonProperty("_id")
-    public ObjectId id;
+    private ObjectId _id;
 
-    public String patientId;
+    private String patientId;
 
-    public String surveyId;
+    private String surveyId;
 
-    public JsonNode data;
+    private JsonNode data;
 
-    public SurveyResponse() {
-
-    }
-
-    private static MongoCollection results(String surveyId) {
+    private static MongoCollection collection(String surveyId) {
         return PlayJongo.getCollection(surveyId);
     }
 
-    public SurveyResponse insert() {
-        results(this.surveyId).save(this);
+    public SurveyResponse save() {
+        collection(this.surveyId).save(this);
         return this;
     }
 
     public static List<SurveyResponse> findByPatientId(String surveyId, String patientId) {
-
-        ArrayList<SurveyResponse> results = new ArrayList<>();
-        Iterable<SurveyResponse> t = results(surveyId).find("{patientId: #}", patientId).as(SurveyResponse.class);
-        Iterator i = t.iterator();
-        while (i.hasNext()) {
-            results.add((SurveyResponse) i.next());
-        }
-        return results;
+        return new MongoList<SurveyResponse>(collection(surveyId).find("{patientId: #}", patientId), SurveyResponse.class).getList();
     }
 
+    @JsonIgnore
+    public ObjectId get_id() {
+        return _id;
+    }
+
+    @JsonProperty("_id")
+    public void set_id(ObjectId _id) {
+        this._id = _id;
+    }
+
+    public String getPatientId() {
+        return patientId;
+    }
+
+    public void setPatientId(String patientId) {
+        this.patientId = patientId;
+    }
+
+    public String getSurveyId() {
+        return surveyId;
+    }
+
+    public void setSurveyId(String surveyId) {
+        this.surveyId = surveyId;
+    }
+
+    public JsonNode getData() {
+        return data;
+    }
+
+    public void setData(JsonNode data) {
+        this.data = data;
+    }
 }

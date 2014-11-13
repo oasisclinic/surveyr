@@ -8,6 +8,7 @@ import org.bson.types.ObjectId;
 import org.jongo.MongoCollection;
 import play.data.validation.Constraints.*;
 import uk.co.panaxiom.playjongo.PlayJongo;
+import utilities.MongoList;
 
 import java.util.*;
 
@@ -17,7 +18,6 @@ public class Patient {
     @JsonIgnore
     private static final MongoCollection collection = PlayJongo.getCollection("patients");
 
-    @JsonProperty("_id")
     private ObjectId _id;
 
     @ApiModelProperty(value = "a unique identifier for a patient", required = false)
@@ -93,5 +93,15 @@ public class Patient {
 
     public void setLastInteraction(Date lastInteraction) {
         this.lastInteraction = lastInteraction;
+    }
+
+    @JsonIgnore
+    public ObjectId get_id() {
+        return _id;
+    }
+
+    @JsonProperty("_id")
+    public void set_id(ObjectId _id) {
+        this._id = _id;
     }
 }

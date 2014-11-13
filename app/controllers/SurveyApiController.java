@@ -3,15 +3,18 @@ package controllers;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.wordnik.swagger.annotations.*;
 import models.*;
+import models.dto.PatientSurveyHistoryDTO;
+import models.dto.SurveyDTO;
+import models.dto.SurveyDataDTO;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
-import play.Logger;
 import play.libs.F;
 import play.libs.XML;
 import play.libs.ws.WSRequestHolder;
 import play.mvc.Result;
+import utilities.QualtricsAPI;
 
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
@@ -102,12 +105,12 @@ public class SurveyApiController {
                 .setQueryParameter("ExportQuestionIDs", "1");
 
         SurveyResponse response = new SurveyResponse();
-        response.patientId = request.getPatientId();
-        response.surveyId = request.getSurveyId();
+        response.setPatientId(request.getPatientId());
+        response.setSurveyId(request.getSurveyId());
 
         return surveyAnswers.get().map(w -> {
-                    response.data = w.asJson();
-                    response.insert();
+                    response.setData(w.asJson());
+                    response.save();
                     return JsonResponse(200, response);
                 }
         );
@@ -181,7 +184,7 @@ public class SurveyApiController {
 
                     for (SurveyResponse r : responses) {
 
-                        String testDate = r.data.findValuesAsText("EndDate").get(0);
+                        String testDate = r.getData().findValuesAsText("EndDate").get(0);
                         DateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
                         Date date = formatter.parse(testDate);
 
@@ -189,7 +192,7 @@ public class SurveyApiController {
 
                         HashMap<String, String> q = new HashMap<>();
 
-                        Iterator<Map.Entry<String, JsonNode>> it = r.data.get(r.data.fieldNames().next()).fields();
+                        Iterator<Map.Entry<String, JsonNode>> it = r.getData().get(r.getData().fieldNames().next()).fields();
                         int i = 0;
                         while (it.hasNext()) {
 

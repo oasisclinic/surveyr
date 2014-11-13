@@ -7,6 +7,7 @@ import org.bson.types.ObjectId;
 import org.jongo.MongoCollection;
 import play.data.validation.Constraints;
 import uk.co.panaxiom.playjongo.PlayJongo;
+import utilities.MongoList;
 
 import java.util.*;
 
@@ -15,8 +16,7 @@ public class SurveyResponseRequest {
     @JsonIgnore
     private static final MongoCollection collection = PlayJongo.getCollection("responseRequests");
 
-    @JsonProperty("_id")
-    public ObjectId id;
+    public ObjectId _id;
 
     @ApiModelProperty(value = "a unique request ID", required = false)
     private String requestId;
@@ -77,7 +77,7 @@ public class SurveyResponseRequest {
 
     public SurveyResponseRequest markComplete() {
         this.complete = true;
-        collection.update("{_id: #}", this.id).with("{$set: {complete: #}}", complete);
+        collection.update("{_id: #}", this._id).with("{$set: {complete: #}}", complete);
         return this;
     }
 
@@ -139,5 +139,15 @@ public class SurveyResponseRequest {
 
     public void setRequestId(String requestId) {
         this.requestId = requestId;
+    }
+
+    @JsonIgnore
+    public ObjectId get_id() {
+        return _id;
+    }
+
+    @JsonProperty("_id")
+    public void set_id(ObjectId _id) {
+        this._id = _id;
     }
 }

@@ -1,4 +1,4 @@
-package models;
+package utilities;
 
 import play.Configuration;
 import play.Play;

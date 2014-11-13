@@ -1,4 +1,4 @@
-package models;
+package utilities;
 
 import org.jongo.Find;
 

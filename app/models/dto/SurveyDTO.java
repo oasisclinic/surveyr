@@ -1,4 +1,4 @@
-package models;
+package models.dto;
 
 import com.wordnik.swagger.annotations.ApiModel;
 
