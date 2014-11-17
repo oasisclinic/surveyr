@@ -29,7 +29,7 @@ public class BaseApiController extends Controller {
         response().setHeader("Access-Control-Allow-Methods", "GET, POST, DELETE, PUT, OPTIONS");
         response().setHeader("Access-Control-Allow-Headers", "Content-Type, api_key, Authorization");
 
-        return status(code, (obj == null)? null : Json.toJson(obj));
+        return status(code, Json.toJson((obj != null) ? obj : ""));
     }
 
 }

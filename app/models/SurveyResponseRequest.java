@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.wordnik.swagger.annotations.ApiModelProperty;
 import org.bson.types.ObjectId;
+import org.jongo.Find;
 import org.jongo.MongoCollection;
 import play.data.validation.Constraints;
 import uk.co.panaxiom.playjongo.PlayJongo;
@@ -59,16 +60,18 @@ public class SurveyResponseRequest {
         return this;
     }
 
-    public static List<SurveyResponseRequest> findIncomplete() {
-        return new MongoList<SurveyResponseRequest>(collection.find("{complete: #}", false), SurveyResponseRequest.class).getList();
+    public static List<SurveyResponseRequest> find(Boolean complete, Integer limit) {
+        String query = (complete != null) ? "{complete: " + complete + "}" : "";
+        Find f = collection.find(query);
+        if (limit != null) f = f.limit(limit).sort("{startDate: -1}");
+        return new MongoList<SurveyResponseRequest>(f, SurveyResponseRequest.class).getList();
     }
 
-    public static List<SurveyResponseRequest> findAll() {
-        return new MongoList<SurveyResponseRequest>(collection.find(), SurveyResponseRequest.class).getList();
-    }
-
-    public static List<SurveyResponseRequest> findCompletedByPatientId(String patientId) {
-        return new MongoList<SurveyResponseRequest>(collection.find("{patientId: #, complete: true}", patientId), SurveyResponseRequest.class).getList();
+    public static List<SurveyResponseRequest> findByPatientId(String patientId, Boolean complete, Integer limit) {
+        String query = (complete != null) ? "complete: " + complete : "";
+        Find f = collection.find("{patientId: #, " + query + "}", patientId);
+        if (limit != null) f = f.limit(limit).sort("{startDate: -1}");
+        return new MongoList<SurveyResponseRequest>(f, SurveyResponseRequest.class).getList();
     }
 
     public static SurveyResponseRequest findOne(String requestId) {

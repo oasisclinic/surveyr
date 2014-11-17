@@ -10,7 +10,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
-import play.libs.F;
+import play.libs.F.*;
 import play.libs.XML;
 import play.libs.ws.WSRequestHolder;
 import play.mvc.Result;
@@ -34,7 +34,7 @@ public class SurveyApiController {
             @ApiResponse(code = 404, message = "No surveys found")
     })
     @Produces("application/json")
-    public static F.Promise<Result> findAll() {
+    public static Promise<Result> findAll() {
 
         WSRequestHolder surveysRequest = QualtricsAPI.request("getSurveys")
                 .setQueryParameter("Format", "JSON");
@@ -61,7 +61,7 @@ public class SurveyApiController {
     @ApiResponses(value = {
             @ApiResponse(code = 302, message = "Administration started")
     })
-    public static F.Promise<Result> administerSurvey(@ApiParam(name = "surveyId", value = "the Qualtrics survey ID to administer", required = true)
+    public static Promise<Result> administerSurvey(@ApiParam(name = "surveyId", value = "the Qualtrics survey ID to administer", required = true)
                                           @PathParam("surveyId") String surveyId,
                                           @ApiParam(name = "patientId", value = "the ID of the patient to administer a survey to", required = true)
                                           @PathParam("patientId") String patientId) {
@@ -84,7 +84,7 @@ public class SurveyApiController {
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Survey response recorded")
     })
-    public static F.Promise<Result> completeSurvey(@ApiParam(name = "requestId", value = "the ID of the survey request", required = true)
+    public static Promise<Result> completeSurvey(@ApiParam(name = "requestId", value = "the ID of the survey request", required = true)
                                                    @PathParam("requestId") String requestId,
                                                    @ApiParam(name = "responseId", value = "the Qualtrics-provided response ID", required = true)
                                                    @PathParam("responseId") String responseId) {
@@ -117,57 +117,41 @@ public class SurveyApiController {
 
     }
 
-    @ApiOperation(nickname = "findAllResponseRequests", value = "Get all survey response requests", httpMethod = "GET", responseContainer = "List", response = SurveyResponseRequest.class)
+    @ApiOperation(nickname = "findRequests", value = "Find survey requests", httpMethod = "GET", responseContainer = "List", response = SurveyResponseRequest.class)
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Requests found"),
-            @ApiResponse(code = 404, message = "No requests found")
+            @ApiResponse(code = 404, message = "No requests found"),
     })
     @Produces("application/json")
-    public static Result findAllResponseRequests() {
+    public static Result findRequests(Option<String> patientId, Option<Boolean> complete, Option<Integer> limit) {
 
-        List<SurveyResponseRequest> requests = SurveyResponseRequest.findAll();
-
-        if (requests.size() > 0) {
-            return JsonResponse(200, requests);
+        List<SurveyResponseRequest> list;
+        if (patientId.getOrElse(null) != null) {
+           list = SurveyResponseRequest.findByPatientId(patientId.get(), complete.getOrElse(null), limit.getOrElse(null));
         } else {
-            return JsonResponse(404, requests);
+           list = SurveyResponseRequest.find(complete.getOrElse(null), limit.getOrElse(null));
         }
+
+        return JsonResponse(list.size() > 0 ? 200 : 404, list);
 
     }
 
-    @ApiOperation(nickname = "findResponseRequestsByPatient", value = "Get all surveys that a patient has started", httpMethod = "GET", responseContainer = "List", response = SurveyResponseRequest.class)
+    @ApiOperation(nickname = "findRequest", value = "Find a single survey request", httpMethod = "GET", response = SurveyResponseRequest.class)
     @ApiResponses(value = {
-            @ApiResponse(code = 200, message = "Requests found")
+            @ApiResponse(code = 200, message = "Request found"),
+            @ApiResponse(code = 404, message = "Request not found")
     })
     @Produces("application/json")
-    public static Result findCompletedResponseRequestsByPatient(@ApiParam(name = "patientId", value = "patientId", required = true)
-                                                       @PathParam("patientId") String patientId) {
+    public static Result findRequest(String requestId) {
 
-        return JsonResponse(SurveyResponseRequest.findCompletedByPatientId(patientId));
-
-    }
-
-    @ApiOperation(nickname = "findAllIncompleteResponseRequests", value = "Get all survey response requests that have yet to be completed", httpMethod = "GET", responseContainer = "List", response = SurveyResponseRequest.class)
-    @ApiResponses(value = {
-            @ApiResponse(code = 200, message = "Incomplete requests found"),
-            @ApiResponse(code = 404, message = "No incomplete requests found")
-    })
-    @Produces("application/json")
-    public static Result findAllIncompleteResponseRequests() {
-
-        List<SurveyResponseRequest> requests = SurveyResponseRequest.findIncomplete();
-
-        if (requests.size() > 0) {
-            return JsonResponse(200, requests);
-        } else {
-            return JsonResponse(404, requests);
-        }
+        SurveyResponseRequest req = SurveyResponseRequest.findOne(requestId);
+        return JsonResponse(req == null ? 404 : 200, req);
 
     }
 
     @ApiOperation(nickname = "findByPatientId", value = "Retrieve all responses for a single user and survey", httpMethod = "GET", response = PatientSurveyHistoryDTO.class)
     @ApiResponses(value = {@ApiResponse(code = 200, message = "Surveys found")})
-    public static F.Promise<Result> findByPatientId(@ApiParam(name = "surveyId", value = "the ID of the survey", required = true)
+    public static Promise<Result> findByPatientId(@ApiParam(name = "surveyId", value = "the ID of the survey", required = true)
                                                     @PathParam("surveyId") String surveyId,
                                                     @ApiParam(name = "patientId", value = "the ID of the patient", required = true)
                                                     @PathParam("patientId") String patientId) {

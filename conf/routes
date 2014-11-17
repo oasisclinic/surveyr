@@ -6,7 +6,7 @@ OPTIONS /api/*wholepath                                 controllers.BaseApiContr
 
 # Patients
 POST    /api/patients/create                            controllers.PatientApiController.create()
-GET     /api/patients/find/all                          controllers.PatientApiController.findAll(limit: Int ?= -1)
+GET     /api/patients/                                  controllers.PatientApiController.findAll(limit: Int ?= -1)
 GET     /api/patients/:patientId                        controllers.PatientApiController.findById(patientId)
 
 # Survey administration
@@ -14,12 +14,11 @@ GET     /api/surveys/start/:surveyId/:patientId         controllers.SurveyApiCon
 GET     /api/surveys/complete/:requestId/:responseId    controllers.SurveyApiController.completeSurvey(requestId, responseId)
 
 # Survey history
-GET     /api/surveys/requests/find/all                  controllers.SurveyApiController.findAllResponseRequests()
-GET     /api/surveys/requests/find/incomplete           controllers.SurveyApiController.findAllIncompleteResponseRequests()
-GET     /api/surveys/requests/completed/:patientId      controllers.SurveyApiController.findCompletedResponseRequestsByPatient(patientId)
+GET     /api/surveys/requests                           controllers.SurveyApiController.findRequests(patientId: play.libs.F.Option[String], complete: play.libs.F.Option[java.lang.Boolean], limit: play.libs.F.Option[java.lang.Integer])
+GET     /api/surveys/requests/:requestId                controllers.SurveyApiController.findRequest(requestId)
 
 # Surveys
-GET     /api/surveys/findAll                            controllers.SurveyApiController.findAll()
+GET     /api/surveys/                                   controllers.SurveyApiController.findAll()
 
 # Survey responses
 GET     /api/surveys/responses/:surveyId/:patientId     controllers.SurveyApiController.findByPatientId(surveyId, patientId)
