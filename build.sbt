@@ -11,7 +11,8 @@ lazy val root = (project in file(".")).enablePlugins(PlayJava)
 libraryDependencies ++= Seq(
   javaWs,
   "uk.co.panaxiom" %% "play-jongo" % "0.7.1-jongo1.0",
-  "com.wordnik" %% "swagger-play2" % "1.3.10"
+  "com.wordnik" %% "swagger-play2" % "1.3.10",
+  "org.apache.shiro" % "shiro-core" % "1.2.3"
 )
 
 sources in (Compile,doc) := Seq.empty
