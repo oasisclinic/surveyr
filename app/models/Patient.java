@@ -9,7 +9,7 @@ import org.jongo.MongoCollection;
 import play.data.validation.Constraints.*;
 import uk.co.panaxiom.playjongo.PlayJongo;
 import utilities.MongoList;
-import utilities.Security;
+import utilities.Secure;
 
 import java.util.*;
 
@@ -57,27 +57,27 @@ public class Patient {
     }
 
     public String getMedicalId() {
-        return Security.decrypt(medicalId);
+        return Secure.decrypt(medicalId);
     }
 
     public void setMedicalId(String medicalId) {
-        this.medicalId = Security.encrypt(medicalId);
+        this.medicalId = Secure.encrypt(medicalId);
     }
 
     public String getFirstName() {
-        return Security.decrypt(firstName);
+        return Secure.decrypt(firstName);
     }
 
     public void setFirstName(String firstName) {
-        this.firstName = Security.encrypt(firstName);
+        this.firstName = Secure.encrypt(firstName);
     }
 
     public String getLastName() {
-        return Security.decrypt(lastName);
+        return Secure.decrypt(lastName);
     }
 
     public void setLastName(String lastName) {
-        this.lastName = Security.encrypt(lastName);
+        this.lastName = Secure.encrypt(lastName);
     }
 
     public String getPatientId() {

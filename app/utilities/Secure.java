@@ -1,21 +1,24 @@
 package utilities;
+import controllers.SecurityController;
+import errors.UnauthorizedError;
+import models.AuthToken;
 import org.apache.shiro.codec.Base64;
 import org.apache.shiro.codec.CodecSupport;
 import org.apache.shiro.crypto.AesCipherService;
 import org.apache.shiro.util.ByteSource;
 import play.Configuration;
 import play.Play;
+import play.mvc.Http;
+import play.mvc.Result;
+import play.mvc.Security.Authenticator;
 
 /**
- * Handles all attribute-level encryption and decryption using AES-256.
+ * Handles encryption and authentication tasks.
  * @author Bradley Davis
  */
-public class Security {
+public class Secure extends Authenticator {
 
-    /** Enables access to application configuration file */
     private static final Configuration conf = Play.application().configuration();
-
-    /** Retrieves key from configuration */
     private static final byte[] keyBytes = Base64.decode(conf.getString("application.key"));
 
     /** AES service provided by Apache Shiro */
@@ -41,6 +44,34 @@ public class Security {
         byte[] encryptedBytes = Base64.decode(string);
         ByteSource decrypted = cipher.decrypt(encryptedBytes, keyBytes);
         return CodecSupport.toString(decrypted.getBytes());
+    }
+
+    /**
+     * Returns the UUID value of the authentication token if it exists and is unexpired
+     * @param ctx the context of the HTTP request
+     * @return a UUID value or null
+     */
+    @Override
+    public String getUsername(Http.Context ctx) {
+
+        String username = null;
+        String[] authTokenHeaderValues = ctx.request().headers().get(SecurityController.AUTH_TOKEN_HEADER);
+
+        if ((authTokenHeaderValues != null) && (authTokenHeaderValues.length == 1) && (authTokenHeaderValues[0] != null)) {
+            AuthToken t = AuthToken.findOne(authTokenHeaderValues[0]);
+            if (t != null && t.isValid()) {
+                ctx.args.put("token", t);
+                return t.getToken();
+            }
+        }
+
+        return null;
+
+    }
+
+    @Override
+    public Result onUnauthorized(Http.Context ctx) {
+        return RestResponse.error(new UnauthorizedError());
     }
 
 }

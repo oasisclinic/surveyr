@@ -20,8 +20,10 @@ import play.libs.F.Promise;
 import play.libs.XML;
 import play.libs.ws.WSRequestHolder;
 import play.mvc.Result;
+import play.mvc.Security;
 import utilities.QualtricsAPI;
 import utilities.RestResponse;
+import utilities.Secure;
 
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
@@ -31,6 +33,7 @@ import java.util.*;
 
 import static play.mvc.Results.redirect;
 
+@Security.Authenticated(Secure.class)
 @Api(value = "/api/surveys", description = "Operations involving surveys")
 public class SurveyApiController {
 

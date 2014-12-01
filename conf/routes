@@ -23,6 +23,10 @@ GET     /api/surveys/                                   controllers.SurveyApiCon
 # Survey responses
 GET     /api/surveys/responses/:surveyId/:patientId     controllers.SurveyApiController.findByPatientId(surveyId, patientId)
 
+# Authentication
+GET     /api/login                                      controllers.SecurityController.login()
+GET     /api/logout                                     controllers.SecurityController.logout()
+
 # API documentation
 GET     /api/explore/patients                           controllers.ApiHelpController.getResource(path = "/api/patients")
 GET     /api/explore/surveys                            controllers.ApiHelpController.getResource(path = "/api/surveys")

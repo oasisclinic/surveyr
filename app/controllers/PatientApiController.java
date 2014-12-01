@@ -6,10 +6,10 @@ import errors.InvalidParameterError;
 import errors.NoObjectsFoundError;
 import models.Patient;
 import play.data.Form;
-import play.mvc.BodyParser;
-import play.mvc.Controller;
-import play.mvc.Result;
+import play.mvc.*;
+import play.mvc.Security;
 import utilities.RestResponse;
+import utilities.Secure;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.PathParam;
@@ -18,6 +18,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
+@Security.Authenticated(Secure.class)
 @Api(value = "/api/patients", description = "Operations involving patients")
 public class PatientApiController extends Controller {
 
