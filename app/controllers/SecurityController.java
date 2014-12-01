@@ -23,7 +23,7 @@ public class SecurityController extends Controller {
      * Generates an authentication token for use in subsequent requests
      * @return an authentication token object
      */
-    public static Result login() {
+    public static Result authenticate() {
 
         AuthToken t = new AuthToken().save();
         response().setCookie(AUTH_TOKEN, t.getToken());
@@ -40,7 +40,7 @@ public class SecurityController extends Controller {
      * @return HTTP response
      */
     @Security.Authenticated(Secure.class)
-    public static Result logout() {
+    public static Result expire() {
 
         AuthToken token = (AuthToken)Http.Context.current().args.get("token");
         token.remove();
