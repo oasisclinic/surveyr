@@ -1,6 +1,7 @@
 package controllers;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.wordnik.swagger.annotations.*;
 import models.*;
 import models.dto.PatientSurveyHistoryDTO;
@@ -10,6 +11,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+import play.Logger;
 import play.libs.F.*;
 import play.libs.XML;
 import play.libs.ws.WSRequestHolder;
@@ -109,7 +111,10 @@ public class SurveyApiController {
         response.setSurveyId(request.getSurveyId());
 
         return surveyAnswers.get().map(w -> {
-                    response.setData(w.asJson());
+                    // discard any identifying data
+                    ObjectNode o = (ObjectNode) w.asJson().get(responseId);
+                    o.remove(Arrays.asList(new String[] {"IPAddress", "EmailAddress", "Name", "requestId", "ExternalDataReference", "ResponseSet"}));
+                    response.setData(o);
                     response.save();
                     return JsonResponse(200, response);
                 }
