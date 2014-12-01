@@ -20,7 +20,7 @@ import java.util.UUID;
 
 @Security.Authenticated(Secure.class)
 @Api(value = "/api/patients", description = "Operations involving patients")
-public class PatientApiController extends Controller {
+public class PatientController extends Controller {
 
     @ApiOperation(nickname = "create", value = "Create a patient record", httpMethod = "POST", response = Patient.class)
     @ApiResponses(value = {@ApiResponse(code = 201, message = "New patient successfully created")})

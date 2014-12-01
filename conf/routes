@@ -5,23 +5,23 @@
 OPTIONS /api/*wholepath                                 utilities.RestResponse.options(wholepath)
 
 # Patients
-POST    /api/patients/create                            controllers.PatientApiController.create()
-GET     /api/patients/                                  controllers.PatientApiController.findAll(limit: Int ?= -1)
-GET     /api/patients/:patientId                        controllers.PatientApiController.findById(patientId)
+POST    /api/patients/create                            controllers.PatientController.create()
+GET     /api/patients/                                  controllers.PatientController.findAll(limit: Int ?= -1)
+GET     /api/patients/:patientId                        controllers.PatientController.findById(patientId)
 
 # Survey administration
-GET     /api/surveys/start/:surveyId/:patientId         controllers.SurveyApiController.administerSurvey(surveyId, patientId)
-GET     /api/surveys/complete/:requestId/:responseId    controllers.SurveyApiController.completeSurvey(requestId, responseId)
+GET     /api/surveys/start/:surveyId/:patientId         controllers.SurveyController.administerSurvey(surveyId, patientId)
+GET     /api/surveys/complete/:requestId/:responseId    controllers.SurveyController.completeSurvey(requestId, responseId)
 
 # Survey history
-GET     /api/surveys/requests                           controllers.SurveyApiController.findRequests(patientId: play.libs.F.Option[String], complete: play.libs.F.Option[java.lang.Boolean], limit: play.libs.F.Option[java.lang.Integer])
-GET     /api/surveys/requests/:requestId                controllers.SurveyApiController.findRequest(requestId)
+GET     /api/surveys/requests                           controllers.SurveyController.findRequests(patientId: play.libs.F.Option[String], complete: play.libs.F.Option[java.lang.Boolean], limit: play.libs.F.Option[java.lang.Integer])
+GET     /api/surveys/requests/:requestId                controllers.SurveyController.findRequest(requestId)
 
 # Surveys
-GET     /api/surveys/                                   controllers.SurveyApiController.findAll()
+GET     /api/surveys/                                   controllers.SurveyController.findAll()
 
 # Survey responses
-GET     /api/surveys/responses/:surveyId/:patientId     controllers.SurveyApiController.findByPatientId(surveyId, patientId)
+GET     /api/surveys/responses/:surveyId/:patientId     controllers.SurveyController.findByPatientId(surveyId, patientId)
 
 # Authentication
 GET     /api/authenticate                               controllers.SecurityController.authenticate()

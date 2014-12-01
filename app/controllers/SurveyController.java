@@ -35,7 +35,7 @@ import static play.mvc.Results.redirect;
 
 @Security.Authenticated(Secure.class)
 @Api(value = "/api/surveys", description = "Operations involving surveys")
-public class SurveyApiController {
+public class SurveyController {
 
     @ApiOperation(nickname = "findAll", value = "Get a list of available surveys", httpMethod = "GET", response = SurveyDTO.class)
     @ApiResponses(value = {
