@@ -13,9 +13,4 @@ import play.mvc.Result;
  */
 public class Security extends Authenticator {
 
-    @Override
-    public Result onUnauthorized(Context ctx) {
-        return JsonResponse
-    }
-
 }

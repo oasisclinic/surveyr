@@ -4,22 +4,22 @@ import play.Configuration;
 import play.Play;
 
 /**
- * Occurs when no patients could be found using the provided parameters.
+ * Occurs when a parameter is of an invalid type or out of bounds.
  * @author Bradley Davis
  */
-public class NoPatientsFoundError implements RestError {
+public class InvalidParameterError implements RestError {
 
     private static final Configuration conf = Play.application().configuration();
-    private static final String NO_PATIENTS_FOUND = conf.getString("errors.nopatientsfound");
+    private static final String INVALID_PARAMETER = conf.getString("invalidparameter");
 
     @Override
     public int getStatusCode() {
-        return 404;
+        return 400;
     }
 
     @Override
     public String getMessage() {
-        return NO_PATIENTS_FOUND;
+        return INVALID_PARAMETER;
     }
 
 }

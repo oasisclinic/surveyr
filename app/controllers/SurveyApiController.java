@@ -3,7 +3,11 @@ package controllers;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.wordnik.swagger.annotations.*;
-import models.*;
+import errors.EmptyResponseBodyException;
+import errors.NoObjectsFoundError;
+import models.Patient;
+import models.SurveyResponse;
+import models.SurveyResponseRequest;
 import models.dto.PatientSurveyHistoryDTO;
 import models.dto.SurveyDTO;
 import models.dto.SurveyDataDTO;
@@ -11,12 +15,13 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
-import play.Logger;
-import play.libs.F.*;
+import play.libs.F.Option;
+import play.libs.F.Promise;
 import play.libs.XML;
 import play.libs.ws.WSRequestHolder;
 import play.mvc.Result;
 import utilities.QualtricsAPI;
+import utilities.RestResponse;
 
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
@@ -24,7 +29,6 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
-import static controllers.BaseApiController.JsonResponse;
 import static play.mvc.Results.redirect;
 
 @Api(value = "/api/surveys", description = "Operations involving surveys")
@@ -42,6 +46,7 @@ public class SurveyApiController {
                 .setQueryParameter("Format", "JSON");
 
         return surveysRequest.get().map(response -> {
+
                     List<SurveyDTO> surveys = new LinkedList<>();
                     JsonNode node = response.asJson().with("Result").withArray("Surveys");
                     Iterator<JsonNode> it = node.elements();
@@ -49,11 +54,13 @@ public class SurveyApiController {
                         JsonNode n = it.next();
                         surveys.add(new SurveyDTO(n.get("SurveyID").asText(), n.get("SurveyName").asText()));
                     }
-                    if (surveys.size() > 0) {
-                        return JsonResponse(200, surveys);
-                    } else {
-                        return JsonResponse(404, surveys);
+
+                    try {
+                        return RestResponse.json(surveys);
+                    } catch (EmptyResponseBodyException e) {
+                        return RestResponse.error(new NoObjectsFoundError("surveys"));
                     }
+
                 }
         );
 
@@ -113,10 +120,17 @@ public class SurveyApiController {
         return surveyAnswers.get().map(w -> {
                     // discard any identifying data
                     ObjectNode o = (ObjectNode) w.asJson().get(responseId);
-                    o.remove(Arrays.asList(new String[] {"IPAddress", "EmailAddress", "Name", "requestId", "ExternalDataReference", "ResponseSet"}));
+                    o.remove(Arrays.asList(new String[]{"IPAddress", "EmailAddress", "Name", "requestId", "ExternalDataReference", "ResponseSet"}));
                     response.setData(o);
                     response.save();
-                    return JsonResponse(200, response);
+
+                    try {
+                        return RestResponse.json(response);
+                    } catch (EmptyResponseBodyException e) {
+                        //TODO: replace with error
+                        return RestResponse.error(new NoObjectsFoundError("responses"));
+                    }
+
                 }
         );
 
@@ -137,7 +151,11 @@ public class SurveyApiController {
            list = SurveyResponseRequest.find(complete.getOrElse(null), limit.getOrElse(null));
         }
 
-        return JsonResponse(list.size() > 0 ? 200 : 404, list);
+        try {
+            return RestResponse.json(list);
+        } catch (EmptyResponseBodyException e) {
+            return RestResponse.error(new NoObjectsFoundError("requests"));
+        }
 
     }
 
@@ -149,8 +167,11 @@ public class SurveyApiController {
     @Produces("application/json")
     public static Result findRequest(String requestId) {
 
-        SurveyResponseRequest req = SurveyResponseRequest.findOne(requestId);
-        return JsonResponse(req == null ? 404 : 200, req);
+        try {
+            return RestResponse.json(SurveyResponseRequest.findOne(requestId));
+        } catch (EmptyResponseBodyException e) {
+            return RestResponse.error(new NoObjectsFoundError("request"));
+        }
 
     }
 
@@ -214,7 +235,7 @@ public class SurveyApiController {
 
                     }
 
-                    return JsonResponse(psh);
+                    return RestResponse.json(psh);
                 }
         );
 

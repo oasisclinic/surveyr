@@ -2,7 +2,7 @@
 # This file defines all application routes (Higher priority routes first)
 
 # API
-OPTIONS /api/*wholepath                                 controllers.BaseApiController.options(wholepath)
+OPTIONS /api/*wholepath                                 utilities.RestResponse.options(wholepath)
 
 # Patients
 POST    /api/patients/create                            controllers.PatientApiController.create()
@@ -24,7 +24,6 @@ GET     /api/surveys/                                   controllers.SurveyApiCon
 GET     /api/surveys/responses/:surveyId/:patientId     controllers.SurveyApiController.findByPatientId(surveyId, patientId)
 
 # API documentation
-OPTIONS /api/explore/*wholepath                         controllers.BaseApiController.options(wholepath)
 GET     /api/explore/patients                           controllers.ApiHelpController.getResource(path = "/api/patients")
 GET     /api/explore/surveys                            controllers.ApiHelpController.getResource(path = "/api/surveys")
 GET     /api/explore/surveyResponses                    controllers.ApiHelpController.getResource(path = "/api/surveyResponses")

@@ -2,12 +2,12 @@ package controllers;
 
 import com.wordnik.swagger.annotations.*;
 import errors.EmptyResponseBodyException;
-import errors.NoPatientsFoundError;
+import errors.InvalidParameterError;
+import errors.NoObjectsFoundError;
 import models.Patient;
-import play.Configuration;
-import play.Play;
 import play.data.Form;
 import play.mvc.BodyParser;
+import play.mvc.Controller;
 import play.mvc.Result;
 import utilities.RestResponse;
 
@@ -19,11 +19,7 @@ import java.util.List;
 import java.util.UUID;
 
 @Api(value = "/api/patients", description = "Operations involving patients")
-public class PatientApiController extends BaseApiController {
-
-    private static final Configuration conf = Play.application().configuration();
-    private static final String NO_PATIENT_FOUND = conf.getString("errors.nosuchpatient");
-    private static final String INVALID_PARAMETER = conf.getString("errors.invalidparameter");
+public class PatientApiController extends Controller {
 
     @ApiOperation(nickname = "create", value = "Create a patient record", httpMethod = "POST", response = Patient.class)
     @ApiResponses(value = {@ApiResponse(code = 201, message = "New patient successfully created")})
@@ -35,13 +31,17 @@ public class PatientApiController extends BaseApiController {
 
         Form<Patient> form = Form.form(Patient.class).bindFromRequest();
         if (form.hasErrors()) {
-            return JsonResponse(400, form.errorsAsJson());
+            return badRequest();
         } else {
             Patient patient = form.get();
             patient.setPatientId(UUID.randomUUID());
             patient.setLastInteraction(new Date());
             patient.save();
-            return JsonResponse(201, patient);
+            try {
+                return RestResponse.json(201, patient);
+            } catch (EmptyResponseBodyException e) {
+                return internalServerError();
+            }
         }
 
     }
@@ -55,8 +55,9 @@ public class PatientApiController extends BaseApiController {
     @Produces("application/json")
     public static Result findAll(@ApiParam(name = "limit", value = "the number of patients to return", required = false)
                                  @PathParam("limit") Integer limit) {
+
         if (limit < -1) {
-            return JsonResponse(400, INVALID_PARAMETER);
+            return RestResponse.error(new InvalidParameterError());
         }
 
         List<Patient> patients = null;
@@ -66,10 +67,10 @@ public class PatientApiController extends BaseApiController {
             patients = Patient.findMostRecent(limit);
         }
 
-        if (patients == null) {
-            return JsonResponse(404, NO_PATIENT_FOUND);
-        } else {
-            return JsonResponse(200, patients);
+        try {
+            return RestResponse.json(patients);
+        } catch (EmptyResponseBodyException e) {
+            return RestResponse.error(new NoObjectsFoundError("patients"));
         }
 
     }
@@ -84,9 +85,9 @@ public class PatientApiController extends BaseApiController {
                                   @PathParam("patientId") String patientId) {
 
         try {
-            return RestResponse.json(200, Patient.findOne(patientId));
+            return RestResponse.json(Patient.findOne(patientId));
         } catch (EmptyResponseBodyException e) {
-            return RestResponse.error(new NoPatientsFoundError());
+            return RestResponse.error(new NoObjectsFoundError("patient"));
         }
 
     }
