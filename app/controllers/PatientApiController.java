@@ -1,12 +1,15 @@
 package controllers;
 
 import com.wordnik.swagger.annotations.*;
+import errors.EmptyResponseBodyException;
+import errors.NoPatientsFoundError;
 import models.Patient;
 import play.Configuration;
 import play.Play;
 import play.data.Form;
 import play.mvc.BodyParser;
 import play.mvc.Result;
+import utilities.RestResponse;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.PathParam;
@@ -80,12 +83,10 @@ public class PatientApiController extends BaseApiController {
     public static Result findById(@ApiParam(name = "patientId", value = "patientId", required = true)
                                   @PathParam("patientId") String patientId) {
 
-        Patient patient = Patient.findOne(patientId);
-
-        if(patient == null) {
-            return JsonResponse(404, NO_PATIENT_FOUND);
-        } else {
-            return JsonResponse(200, patient);
+        try {
+            return RestResponse.json(200, Patient.findOne(patientId));
+        } catch (EmptyResponseBodyException e) {
+            return RestResponse.error(new NoPatientsFoundError());
         }
 
     }

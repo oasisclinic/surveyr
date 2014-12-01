@@ -1,7 +1,9 @@
 package utilities;
 
-import exceptions.EmptyResponseBodyException;
+import errors.EmptyResponseBodyException;
+import errors.RestError;
 import play.Configuration;
+import play.Logger;
 import play.Play;
 import play.libs.Json;
 import play.mvc.Controller;
@@ -35,10 +37,26 @@ public class RestResponse extends Controller {
     }
 
     /**
+     * Sends a HTTP response using a RestError object
+     * @param obj the RestError to send
+     * @return HTTP response
+     */
+    public static <T extends RestError> Result error(T obj) {
+
+        try {
+            return json(obj.getStatusCode(), obj.getMessage());
+        } catch (EmptyResponseBodyException e) {
+            Logger.trace("REST error encountered with empty error object, returning HTTP 500");
+            return internalServerError();
+        }
+
+    }
+
+    /**
      * Sends a HTTP response using a status code and serializes an object into JSON for the response body
      * @param httpCode the status code to respond with
      * @param obj the object to serialize to JSON
-     * @return Play result
+     * @return HTTP response
      * @throws EmptyResponseBodyException if the object is null
      */
     public static Result json(int httpCode, Object obj) throws EmptyResponseBodyException {
