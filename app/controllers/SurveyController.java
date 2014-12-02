@@ -21,8 +21,8 @@ import play.libs.XML;
 import play.libs.ws.WSRequestHolder;
 import play.mvc.Result;
 import play.mvc.Security;
-import utilities.QualtricsAPI;
-import utilities.RestResponse;
+import utilities.Qualtrics;
+import utilities.Rest;
 import utilities.Secure;
 
 import javax.ws.rs.PathParam;
@@ -45,7 +45,7 @@ public class SurveyController {
     @Produces("application/json")
     public static Promise<Result> findAll() {
 
-        WSRequestHolder surveysRequest = QualtricsAPI.request("getSurveys")
+        WSRequestHolder surveysRequest = Qualtrics.request("getSurveys")
                 .setQueryParameter("Format", "JSON");
 
         return surveysRequest.get().map(response -> {
@@ -59,9 +59,9 @@ public class SurveyController {
                     }
 
                     try {
-                        return RestResponse.json(surveys);
+                        return Rest.json(surveys);
                     } catch (EmptyResponseBodyException e) {
-                        return RestResponse.error(new NoObjectsFoundError("surveys"));
+                        return Rest.error(new NoObjectsFoundError("surveys"));
                     }
 
                 }
@@ -78,7 +78,7 @@ public class SurveyController {
                                           @ApiParam(name = "patientId", value = "the ID of the patient to administer a survey to", required = true)
                                           @PathParam("patientId") String patientId) {
 
-        WSRequestHolder getSurveyName = QualtricsAPI.request("getSurveyName")
+        WSRequestHolder getSurveyName = Qualtrics.request("getSurveyName")
                 .setQueryParameter("Format", "JSON")
                 .setQueryParameter("SurveyID", surveyId);
 
@@ -86,7 +86,7 @@ public class SurveyController {
                     String surveyName = response.asJson().with("Result").get("SurveyName").asText();
                     String requestId = UUID.randomUUID().toString();
                     SurveyResponseRequest request = new SurveyResponseRequest(requestId, patientId, surveyId, surveyName, new Date()).save();
-                    return redirect(QualtricsAPI.createSurveyUrl(surveyId, requestId));
+                    return redirect(Qualtrics.createSurveyUrl(surveyId, requestId));
                 }
         );
 
@@ -110,7 +110,7 @@ public class SurveyController {
         patient.setLastInteraction(new Date());
         patient.save();
 
-        WSRequestHolder surveyAnswers = QualtricsAPI.request("getLegacyResponseData")
+        WSRequestHolder surveyAnswers = Qualtrics.request("getLegacyResponseData")
                 .setQueryParameter("Format", "JSON")
                 .setQueryParameter("SurveyID", request.getSurveyId())
                 .setQueryParameter("ResponseID", responseId)
@@ -128,10 +128,10 @@ public class SurveyController {
                     response.save();
 
                     try {
-                        return RestResponse.json(response);
+                        return Rest.json(response);
                     } catch (EmptyResponseBodyException e) {
                         //TODO: replace with error
-                        return RestResponse.error(new NoObjectsFoundError("responses"));
+                        return Rest.error(new NoObjectsFoundError("responses"));
                     }
 
                 }
@@ -155,9 +155,9 @@ public class SurveyController {
         }
 
         try {
-            return RestResponse.json(list);
+            return Rest.json(list);
         } catch (EmptyResponseBodyException e) {
-            return RestResponse.error(new NoObjectsFoundError("requests"));
+            return Rest.error(new NoObjectsFoundError("requests"));
         }
 
     }
@@ -171,9 +171,9 @@ public class SurveyController {
     public static Result findRequest(String requestId) {
 
         try {
-            return RestResponse.json(SurveyResponseRequest.findOne(requestId));
+            return Rest.json(SurveyResponseRequest.findOne(requestId));
         } catch (EmptyResponseBodyException e) {
-            return RestResponse.error(new NoObjectsFoundError("request"));
+            return Rest.error(new NoObjectsFoundError("request"));
         }
 
     }
@@ -185,7 +185,7 @@ public class SurveyController {
                                                     @ApiParam(name = "patientId", value = "the ID of the patient", required = true)
                                                     @PathParam("patientId") String patientId) {
 
-        WSRequestHolder surveyDef = QualtricsAPI.request("getSurvey").setQueryParameter("SurveyID", surveyId);
+        WSRequestHolder surveyDef = Qualtrics.request("getSurvey").setQueryParameter("SurveyID", surveyId);
 
         List<SurveyResponse> responses = SurveyResponse.findByPatientId(surveyId, patientId);
 
@@ -238,7 +238,7 @@ public class SurveyController {
 
                     }
 
-                    return RestResponse.json(psh);
+                    return Rest.json(psh);
                 }
         );
 

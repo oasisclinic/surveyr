@@ -15,7 +15,7 @@ import java.util.Collection;
  * Handles all rest responses, including CORS preflight requests and response serialization.
  * @author Bradley Davis
  */
-public class RestResponse extends Controller {
+public class Rest extends Controller {
 
     // Load CORS header preferences from application configuration
     private static final Configuration conf = Play.application().configuration();

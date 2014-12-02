@@ -5,7 +5,7 @@ import play.Play;
 import play.libs.ws.WS;
 import play.libs.ws.WSRequestHolder;
 
-public abstract class QualtricsAPI {
+public abstract class Qualtrics {
 
     private static final Configuration conf = Play.application().configuration();
     private static final String API_BASE_URL = conf.getString("qualtrics.api.baseUrl");

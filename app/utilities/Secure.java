@@ -71,7 +71,7 @@ public class Secure extends Authenticator {
 
     @Override
     public Result onUnauthorized(Http.Context ctx) {
-        return RestResponse.error(new UnauthorizedError());
+        return Rest.error(new UnauthorizedError());
     }
 
 }

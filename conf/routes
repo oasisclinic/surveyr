@@ -2,12 +2,15 @@
 # This file defines all application routes (Higher priority routes first)
 
 # API
-OPTIONS /api/*wholepath                                 utilities.RestResponse.options(wholepath)
+OPTIONS /api/*wholepath                                 utilities.Rest.options(wholepath)
 
 # Patients
 POST    /api/patients/create                            controllers.PatientController.create()
 GET     /api/patients/                                  controllers.PatientController.findAll(limit: Int ?= -1)
 GET     /api/patients/:patientId                        controllers.PatientController.findById(patientId)
+
+GET     /api/evaluations/requestStart/:surveyId/:patientId   controllers.EvaluationController.requestStart(surveyId, patientId)
+GET     /api/evaluations/start/:pin                     controllers.EvaluationController.start(pin: Int)
 
 # Survey administration
 GET     /api/surveys/start/:surveyId/:patientId         controllers.SurveyController.administerSurvey(surveyId, patientId)

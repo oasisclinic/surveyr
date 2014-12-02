@@ -6,7 +6,7 @@ import play.Configuration;
 import play.Play;
 import play.mvc.*;
 import play.mvc.Security;
-import utilities.RestResponse;
+import utilities.Rest;
 import utilities.Secure;
 
 /**
@@ -28,7 +28,7 @@ public class SecurityController extends Controller {
         AuthToken t = new AuthToken().save();
         response().setCookie(AUTH_TOKEN, t.getToken());
         try {
-            return RestResponse.json(t);
+            return Rest.json(t);
         } catch (EmptyResponseBodyException e) {
             return internalServerError();
         }

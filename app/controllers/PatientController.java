@@ -8,7 +8,7 @@ import models.Patient;
 import play.data.Form;
 import play.mvc.*;
 import play.mvc.Security;
-import utilities.RestResponse;
+import utilities.Rest;
 import utilities.Secure;
 
 import javax.ws.rs.Consumes;
@@ -39,7 +39,7 @@ public class PatientController extends Controller {
             patient.setLastInteraction(new Date());
             patient.save();
             try {
-                return RestResponse.json(201, patient);
+                return Rest.json(201, patient);
             } catch (EmptyResponseBodyException e) {
                 return internalServerError();
             }
@@ -58,7 +58,7 @@ public class PatientController extends Controller {
                                  @PathParam("limit") Integer limit) {
 
         if (limit < -1) {
-            return RestResponse.error(new InvalidParameterError());
+            return Rest.error(new InvalidParameterError());
         }
 
         List<Patient> patients = null;
@@ -69,9 +69,9 @@ public class PatientController extends Controller {
         }
 
         try {
-            return RestResponse.json(patients);
+            return Rest.json(patients);
         } catch (EmptyResponseBodyException e) {
-            return RestResponse.error(new NoObjectsFoundError("patients"));
+            return Rest.error(new NoObjectsFoundError("patients"));
         }
 
     }
@@ -86,9 +86,9 @@ public class PatientController extends Controller {
                                   @PathParam("patientId") String patientId) {
 
         try {
-            return RestResponse.json(Patient.findOne(patientId));
+            return Rest.json(Patient.findOne(patientId));
         } catch (EmptyResponseBodyException e) {
-            return RestResponse.error(new NoObjectsFoundError("patient"));
+            return Rest.error(new NoObjectsFoundError("patient"));
         }
 
     }
