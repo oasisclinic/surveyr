@@ -75,6 +75,11 @@ public class Rest extends Controller {
      */
     public static Result json(int httpCode, Object obj) throws EmptyResponseBodyException {
 
+        response().setContentType("application/json");
+        response().setHeader("Access-Control-Allow-Origin", ACCESS_CONTROL_ALLOW_ORIGIN);
+        response().setHeader("Access-Control-Allow-Methods", ACCESS_CONTROL_ALLOW_METHODS);
+        response().setHeader("Access-Control-Allow-Headers", ACCESS_CONTROL_ALLOW_HEADERS);
+
         if (obj == null) throw new EmptyResponseBodyException();
         else if (obj instanceof Collection) {
             if (((Collection) obj).size() == 0) throw new EmptyResponseBodyException();

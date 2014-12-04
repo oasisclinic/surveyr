@@ -9,25 +9,27 @@ POST    /api/patients/create                            controllers.PatientContr
 GET     /api/patients/                                  controllers.PatientController.findAll(limit: Int ?= -1)
 GET     /api/patients/:patientId                        controllers.PatientController.findById(patientId)
 
-GET     /api/evaluations/requestStart/:surveyId/:patientId   controllers.EvaluationController.requestStart(surveyId, patientId)
-GET     /api/evaluations/start/:pin                     controllers.EvaluationController.start(pin: Int)
+GET     /api/evaluations/start/:surveyId/:patientId         controllers.EvaluationController.request(surveyId, patientId)
+GET     /api/evaluations/start/:pin                         controllers.EvaluationController.start(pin: Int)
+GET     /api/evaluations/complete/:requestId/:responseId    controllers.EvaluationController.complete(requestId, responseId)
+GET     /api/evaluations/:surveyId/:patientId               controllers.EvaluationController.findByPatientId(surveyId, patientId)
 
 # Survey administration
-GET     /api/surveys/start/:surveyId/:patientId         controllers.SurveyController.administerSurvey(surveyId, patientId)
-GET     /api/surveys/complete/:requestId/:responseId    controllers.SurveyController.completeSurvey(requestId, responseId)
+# GET     /api/surveys/start/:surveyId/:patientId         controllers.SurveyController.administerSurvey(surveyId, patientId)
+# GET     /api/surveys/complete/:requestId/:responseId    controllers.SurveyController.completeSurvey(requestId, responseId)
 
 # Survey history
-GET     /api/surveys/requests                           controllers.SurveyController.findRequests(patientId: play.libs.F.Option[String], complete: play.libs.F.Option[java.lang.Boolean], limit: play.libs.F.Option[java.lang.Integer])
-GET     /api/surveys/requests/:requestId                controllers.SurveyController.findRequest(requestId)
+# GET     /api/surveys/requests                           controllers.SurveyController.findRequests(patientId: play.libs.F.Option[String], complete: play.libs.F.Option[java.lang.Boolean], limit: play.libs.F.Option[java.lang.Integer])
+# GET     /api/surveys/requests/:requestId                controllers.SurveyController.findRequest(requestId)
 
 # Surveys
 GET     /api/surveys/                                   controllers.SurveyController.findAll()
 
 # Survey responses
-GET     /api/surveys/responses/:surveyId/:patientId     controllers.SurveyController.findByPatientId(surveyId, patientId)
+# GET     /api/surveys/responses/:surveyId/:patientId     controllers.SurveyController.findByPatientId(surveyId, patientId)
 
 # Authentication
-GET     /api/authenticate                               controllers.SecurityController.authenticate()
+POST    /api/authenticate                               controllers.SecurityController.authenticate()
 GET     /api/logout                                     controllers.SecurityController.expire()
 
 # API documentation

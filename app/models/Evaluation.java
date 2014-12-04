@@ -65,6 +65,10 @@ public class Evaluation {
         return new MongoList<Evaluation>(collection.find(String.format(query, fieldName), value), Evaluation.class).getList();
     }
 
+    public static List<Evaluation> findByPatientId(String surveyId, String patientId) {
+        return new MongoList<Evaluation>(collection.find("{surveyId: #, patientId: #}", surveyId, patientId), Evaluation.class).getList();
+    }
+
     @JsonIgnore
     public ObjectId get_id() {
         return _id;
@@ -108,6 +112,22 @@ public class Evaluation {
 
     public ObjectNode getData() {
         return data;
+    }
+
+    public void setResponseId(String responseId) {
+        this.responseId = responseId;
+    }
+
+    public void setComplete(boolean complete) {
+        this.complete = complete;
+    }
+
+    public void setEndDate(Date endDate) {
+        this.endDate = endDate;
+    }
+
+    public void setData(ObjectNode data) {
+        this.data = data;
     }
 
 }
