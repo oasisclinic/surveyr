@@ -33,7 +33,6 @@ import java.util.*;
 
 import static play.mvc.Results.redirect;
 
-@Security.Authenticated(Secure.class)
 @Api(value = "/api/surveys", description = "Operations involving surveys")
 public class SurveyController {
 
