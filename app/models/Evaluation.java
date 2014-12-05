@@ -62,10 +62,10 @@ public class Evaluation {
     }
 
     public static List<Evaluation> findByField(String fieldName, Object value) {
-        return new MongoList<Evaluation>(collection.find(String.format(query, fieldName), value), Evaluation.class).getList();
+        return new MongoList<Evaluation>(collection.find(String.format(query, fieldName), value).sort("{startDate: -1}"), Evaluation.class).getList();
     }
 
-    public static List<Evaluation> findByPatientId(String surveyId, String patientId) {
+    public static List<Evaluation> findByPatientIdSurveyId(String patientId, String surveyId) {
         return new MongoList<Evaluation>(collection.find("{surveyId: #, patientId: #}", surveyId, patientId), Evaluation.class).getList();
     }
 

@@ -18,6 +18,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
+//@Security.Authenticated(Secure.class)
 @Api(value = "/api/patients", description = "Operations involving patients")
 public class PatientController extends Controller {
 

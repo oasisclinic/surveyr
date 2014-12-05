@@ -55,6 +55,7 @@ public class Secure extends Authenticator {
     public String getUsername(Http.Context ctx) {
 
         String username = null;
+        // Although the RFC says headers are case-insensitive, this is a map of headers and thus must be case-sensitive
         String[] authTokenHeaderValues = ctx.request().headers().get(SecurityController.AUTH_TOKEN_HEADER);
 
         if ((authTokenHeaderValues != null) && (authTokenHeaderValues.length == 1) && (authTokenHeaderValues[0] != null)) {

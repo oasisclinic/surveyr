@@ -23,14 +23,17 @@ import play.libs.XML;
 import play.libs.ws.WSRequestHolder;
 import play.mvc.Controller;
 import play.mvc.Result;
+import play.mvc.Security;
 import utilities.Qualtrics;
 import utilities.Rest;
+import utilities.Secure;
 
 import javax.ws.rs.PathParam;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
+//@Security.Authenticated(Secure.class)
 public class EvaluationController extends Controller {
 
     @ApiOperation(nickname = "request", value = "Request an evaluation", httpMethod = "GET", response = Evaluation.class)
@@ -112,16 +115,29 @@ public class EvaluationController extends Controller {
 
     }
 
+    public static Result findAllByPatientId(@ApiParam(name = "patientId", value = "the ID of the patient", required = true)
+                                            @PathParam("patientId") String patientId) {
+
+        List<Evaluation> list = Evaluation.findByField("patientId", patientId);
+
+        try {
+            return Rest.json(list);
+        } catch (EmptyResponseBodyException e) {
+            return Rest.error(new NoObjectsFoundError("evaluations"));
+        }
+    }
+
+
     @ApiOperation(nickname = "findByPatientId", value = "Retrieve all responses for a single user and survey", httpMethod = "GET", response = PatientSurveyHistoryDTO.class)
     @ApiResponses(value = {@ApiResponse(code = 200, message = "Surveys found")})
-    public static Promise<Result> findByPatientId(@ApiParam(name = "surveyId", value = "the ID of the survey", required = true)
-                                                  @PathParam("surveyId") String surveyId,
-                                                  @ApiParam(name = "patientId", value = "the ID of the patient", required = true)
-                                                  @PathParam("patientId") String patientId) {
+    public static Promise<Result> findByPatientId(@ApiParam(name = "patientId", value = "the ID of the patient", required = true)
+                                                  @PathParam("patientId") String patientId,
+                                                  @ApiParam(name = "surveyId", value = "the ID of the survey", required = true)
+                                                  @PathParam("surveyId") String surveyId) {
 
         WSRequestHolder surveyDef = Qualtrics.request("getSurvey").setQueryParameter("SurveyID", surveyId);
 
-        List<Evaluation> responses = Evaluation.findByPatientId(surveyId, patientId);
+        List<Evaluation> responses = Evaluation.findByPatientIdSurveyId(patientId, surveyId);
 
         return surveyDef.get().map(response -> {
 

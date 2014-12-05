@@ -33,6 +33,7 @@ import java.util.*;
 
 import static play.mvc.Results.redirect;
 
+@Security.Authenticated(Secure.class)
 @Api(value = "/api/surveys", description = "Operations involving surveys")
 public class SurveyController {
 
@@ -43,6 +44,38 @@ public class SurveyController {
     })
     @Produces("application/json")
     public static Promise<Result> findAll() {
+
+        WSRequestHolder surveysRequest = Qualtrics.request("getSurveys")
+                .setQueryParameter("Format", "JSON");
+
+        return surveysRequest.get().map(response -> {
+
+                    List<SurveyDTO> surveys = new LinkedList<>();
+                    JsonNode node = response.asJson().with("Result").withArray("Surveys");
+                    Iterator<JsonNode> it = node.elements();
+                    while (it.hasNext()) {
+                        JsonNode n = it.next();
+                        surveys.add(new SurveyDTO(n.get("SurveyID").asText(), n.get("SurveyName").asText()));
+                    }
+
+                    try {
+                        return Rest.json(surveys);
+                    } catch (EmptyResponseBodyException e) {
+                        return Rest.error(new NoObjectsFoundError("surveys"));
+                    }
+
+                }
+        );
+
+    }
+
+    @ApiOperation(nickname = "findByPatientId", value = "Get a list of surveys taken by a patient", httpMethod = "GET", response = SurveyDTO.class)
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "Surveys found"),
+            @ApiResponse(code = 404, message = "No surveys found")
+    })
+    @Produces("application/json")
+    public static Promise<Result> findByPatientId() {
 
         WSRequestHolder surveysRequest = Qualtrics.request("getSurveys")
                 .setQueryParameter("Format", "JSON");
