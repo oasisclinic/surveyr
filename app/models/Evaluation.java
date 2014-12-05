@@ -66,6 +66,10 @@ public class Evaluation {
         return collection.findOne(String.format(query, fieldName), value).as(Evaluation.class);
     }
 
+    public static List<Evaluation> findRecent(int limit) {
+        return new MongoList<Evaluation>(collection.find().limit(limit).sort("{startDate: -1}"), Evaluation.class).getList();
+    }
+
     public static List<Evaluation> findByField(String fieldName, Object value) {
         return new MongoList<Evaluation>(collection.find(String.format(query, fieldName), value).sort("{startDate: -1}"), Evaluation.class).getList();
     }

@@ -36,6 +36,4 @@ public class Global extends GlobalSettings {
         return F.Promise.<Result>pure(Rest.error(new PlayError("Invalid URL", 404)));
     }
 
-
-
 }

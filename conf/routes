@@ -9,6 +9,7 @@ POST    /api/patients/create                            controllers.PatientContr
 GET     /api/patients                                   controllers.PatientController.findAll(limit: Int ?= -1)
 GET     /api/patients/:patientId                        controllers.PatientController.findById(patientId)
 
+GET     /api/evaluations                                    controllers.EvaluationController.recent(limit: Int ?= 5)
 GET     /api/evaluations/start/:patientId/:surveyId         controllers.EvaluationController.request(surveyId, patientId)
 GET     /api/evaluations/start/:pin                         controllers.EvaluationController.start(pin: Int)
 GET     /api/evaluations/complete/:requestId/:responseId    controllers.EvaluationController.complete(requestId, responseId)

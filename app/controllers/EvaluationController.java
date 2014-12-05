@@ -130,6 +130,19 @@ public class EvaluationController extends Controller {
 
     }
 
+    public static Result recent(@ApiParam(name = "limit", value = "the number of evaluations to return", required = false)
+                                @PathParam("limit") Integer limit) {
+
+        List<Evaluation> list = Evaluation.findRecent(limit);
+
+        try {
+            return Rest.json(list);
+        } catch (EmptyResponseBodyException e) {
+            return Rest.error(new NoObjectsFoundError("evaluations"));
+        }
+
+    }
+
     public static Result findAllByPatientId(@ApiParam(name = "patientId", value = "the ID of the patient", required = true)
                                             @PathParam("patientId") String patientId) {
 
