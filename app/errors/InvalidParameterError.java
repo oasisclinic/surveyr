@@ -10,7 +10,7 @@ import play.Play;
 public class InvalidParameterError implements RestError {
 
     private static final Configuration conf = Play.application().configuration();
-    private static final String INVALID_PARAMETER = conf.getString("invalidparameter");
+    private static final String INVALID_PARAMETER = conf.getString("errors.invalidparameter");
 
     @Override
     public int getStatusCode() {
