@@ -7,6 +7,7 @@ import com.wordnik.swagger.annotations.ApiParam;
 import com.wordnik.swagger.annotations.ApiResponse;
 import com.wordnik.swagger.annotations.ApiResponses;
 import errors.EmptyResponseBodyException;
+import errors.InvalidParameterError;
 import errors.NoObjectsFoundError;
 import models.Evaluation;
 import models.Patient;
@@ -14,6 +15,7 @@ import models.SurveyResponse;
 import models.SurveyResponseRequest;
 import models.dto.PatientSurveyHistoryDTO;
 import models.dto.SurveyDataDTO;
+import models.dto.UrlDto;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -69,7 +71,15 @@ public class EvaluationController extends Controller {
                                         @PathParam("pin") Integer pin) {
 
         Evaluation eval = Evaluation.findOneByField("pinCode", pin);
-        return redirect(Qualtrics.createSurveyUrl(eval.getSurveyId(), eval.getEvaluationId()));
+
+        try {
+            if(eval == null) {
+                return Rest.error(new InvalidParameterError());
+            }
+            return Rest.json(new UrlDto(Qualtrics.createSurveyUrl(eval.getSurveyId(), eval.getEvaluationId())));
+        } catch (EmptyResponseBodyException e) {
+            return Rest.error(new InvalidParameterError());
+        }
 
     }
 

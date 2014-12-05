@@ -9,7 +9,7 @@ POST    /api/patients/create                            controllers.PatientContr
 GET     /api/patients                                   controllers.PatientController.findAll(limit: Int ?= -1)
 GET     /api/patients/:patientId                        controllers.PatientController.findById(patientId)
 
-GET     /api/evaluations/start/:surveyId/:patientId         controllers.EvaluationController.request(surveyId, patientId)
+GET     /api/evaluations/start/:patientId/:surveyId         controllers.EvaluationController.request(surveyId, patientId)
 GET     /api/evaluations/start/:pin                         controllers.EvaluationController.start(pin: Int)
 GET     /api/evaluations/complete/:requestId/:responseId    controllers.EvaluationController.complete(requestId, responseId)
 GET     /api/evaluations/results/:patientId/:surveyId       controllers.EvaluationController.findByPatientIdSurveyId(patientId, surveyId)
@@ -25,7 +25,7 @@ GET     /api/evaluations/:evaluationId                      controllers.Evaluati
 # GET     /api/surveys/requests/:requestId                controllers.SurveyController.findRequest(requestId)
 
 # Surveys
-GET      /api/surveys/                                   controllers.SurveyController.findAll()
+GET      /api/surveys                                      controllers.SurveyController.findAll()
 
 # Survey responses
 # GET     /api/surveys/responses/:surveyId/:patientId     controllers.SurveyController.findByPatientId(surveyId, patientId)
