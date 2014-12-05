@@ -128,6 +128,18 @@ public class EvaluationController extends Controller {
         }
     }
 
+    public static Result findById(@ApiParam(name = "evaluationId", value = "the ID of the evaluation", required = true)
+                                            @PathParam("evaluationId") String evaluationId) {
+
+        Evaluation eval = Evaluation.findOneByField("evaluationId", evaluationId);
+
+        try {
+            return Rest.json(eval);
+        } catch (EmptyResponseBodyException e) {
+            return Rest.error(new NoObjectsFoundError("evaluation"));
+        }
+    }
+
 
     @ApiOperation(nickname = "findByPatientId", value = "Retrieve all responses for a single user and survey", httpMethod = "GET", response = PatientSurveyHistoryDTO.class)
     @ApiResponses(value = {@ApiResponse(code = 200, message = "Surveys found")})
