@@ -57,6 +57,11 @@ public class Evaluation {
         return this;
     }
 
+    public Evaluation remove() {
+        collection.remove("{evaluationId: '" + this.evaluationId + "'}");
+        return this;
+    }
+
     public static Evaluation findOneByField(String fieldName, Object value) {
         return collection.findOne(String.format(query, fieldName), value).as(Evaluation.class);
     }

@@ -15,6 +15,7 @@ GET     /api/evaluations/complete/:requestId/:responseId    controllers.Evaluati
 GET     /api/evaluations/results/:patientId/:surveyId       controllers.EvaluationController.findByPatientIdSurveyId(patientId, surveyId)
 GET     /api/evaluations/results/:patientId                 controllers.EvaluationController.findAllByPatientId(patientId)
 GET     /api/evaluations/:evaluationId                      controllers.EvaluationController.findById(evaluationId)
+DELETE  /api/evaluations/:evaluationId                      controllers.EvaluationController.deleteById(evaluationId)
 
 # Survey administration
 # GET     /api/surveys/start/:surveyId/:patientId         controllers.SurveyController.administerSurvey(surveyId, patientId)
