@@ -66,7 +66,7 @@ public class Evaluation {
     }
 
     public static List<Evaluation> findByPatientIdSurveyId(String patientId, String surveyId) {
-        return new MongoList<Evaluation>(collection.find("{surveyId: #, patientId: #, complete: true}", surveyId, patientId), Evaluation.class).getList();
+        return new MongoList<Evaluation>(collection.find("{surveyId: #, patientId: #, complete: true}", surveyId, patientId).sort("{endDate: 1}"), Evaluation.class).getList();
     }
 
     @JsonIgnore
