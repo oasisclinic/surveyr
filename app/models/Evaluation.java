@@ -69,7 +69,6 @@ public class Evaluation {
         return new MongoList<Evaluation>(collection.find("{surveyId: #, patientId: #, complete: true}", surveyId, patientId).sort("{endDate: 1}"), Evaluation.class).getList();
     }
 
-    @JsonIgnore
     public ObjectId get_id() {
         return _id;
     }

@@ -87,6 +87,8 @@ public class EvaluationController extends Controller {
         eval.setEndDate(new Date());
         eval.setComplete(true);
 
+        Logger.debug(eval.toString());
+
         Patient patient = Patient.findOne(eval.getPatientId());
         patient.setLastInteraction(new Date());
         patient.save();
@@ -103,6 +105,8 @@ public class EvaluationController extends Controller {
                     o.remove(Arrays.asList(new String[]{"IPAddress", "EmailAddress", "Name", "requestId", "ExternalDataReference", "ResponseSet"}));
                     eval.setData(o);
                     eval.save();
+
+                    Logger.debug(eval.toString());
 
                     try {
                         return Rest.json(eval);
