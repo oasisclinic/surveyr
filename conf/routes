@@ -12,7 +12,7 @@ GET     /api/patients/:patientId                        controllers.PatientContr
 GET     /api/evaluations/start/:surveyId/:patientId         controllers.EvaluationController.request(surveyId, patientId)
 GET     /api/evaluations/start/:pin                         controllers.EvaluationController.start(pin: Int)
 GET     /api/evaluations/complete/:requestId/:responseId    controllers.EvaluationController.complete(requestId, responseId)
-GET     /api/evaluations/results/:patientId/:surveyId       controllers.EvaluationController.findByPatientId(patientId, surveyId)
+GET     /api/evaluations/results/:patientId/:surveyId       controllers.EvaluationController.findByPatientIdSurveyId(patientId, surveyId)
 GET     /api/evaluations/results/:patientId                 controllers.EvaluationController.findAllByPatientId(patientId)
 #GET     /api/evaluations/:evaluationId                         controllers.EvaluationController.findAllByPatientId(patientId)
 

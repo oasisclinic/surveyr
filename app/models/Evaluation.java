@@ -26,7 +26,7 @@ public class Evaluation {
     private boolean complete;
     private Date startDate;
     private Date endDate;
-    private ObjectNode data;
+    private JsonNode data;
 
     public Evaluation(){}
 
@@ -66,7 +66,7 @@ public class Evaluation {
     }
 
     public static List<Evaluation> findByPatientIdSurveyId(String patientId, String surveyId) {
-        return new MongoList<Evaluation>(collection.find("{surveyId: #, patientId: #}", surveyId, patientId), Evaluation.class).getList();
+        return new MongoList<Evaluation>(collection.find("{surveyId: #, patientId: #, complete: true}", surveyId, patientId), Evaluation.class).getList();
     }
 
     @JsonIgnore
@@ -110,7 +110,7 @@ public class Evaluation {
         return endDate;
     }
 
-    public ObjectNode getData() {
+    public JsonNode getData() {
         return data;
     }
 

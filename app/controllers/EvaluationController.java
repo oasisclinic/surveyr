@@ -18,6 +18,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+import play.Logger;
 import play.libs.F.Promise;
 import play.libs.XML;
 import play.libs.ws.WSRequestHolder;
@@ -130,7 +131,7 @@ public class EvaluationController extends Controller {
 
     @ApiOperation(nickname = "findByPatientId", value = "Retrieve all responses for a single user and survey", httpMethod = "GET", response = PatientSurveyHistoryDTO.class)
     @ApiResponses(value = {@ApiResponse(code = 200, message = "Surveys found")})
-    public static Promise<Result> findByPatientId(@ApiParam(name = "patientId", value = "the ID of the patient", required = true)
+    public static Promise<Result> findByPatientIdSurveyId(@ApiParam(name = "patientId", value = "the ID of the patient", required = true)
                                                   @PathParam("patientId") String patientId,
                                                   @ApiParam(name = "surveyId", value = "the ID of the survey", required = true)
                                                   @PathParam("surveyId") String surveyId) {
@@ -138,6 +139,7 @@ public class EvaluationController extends Controller {
         WSRequestHolder surveyDef = Qualtrics.request("getSurvey").setQueryParameter("SurveyID", surveyId);
 
         List<Evaluation> responses = Evaluation.findByPatientIdSurveyId(patientId, surveyId);
+        Logger.info("found: " + responses);
 
         return surveyDef.get().map(response -> {
 
@@ -155,7 +157,7 @@ public class EvaluationController extends Controller {
 
                         HashMap<String, String> q = new HashMap<>();
 
-                        Iterator<Map.Entry<String, JsonNode>> it = eval.getData().get(eval.getData().fieldNames().next()).fields();
+                        Iterator<Map.Entry<String, JsonNode>> it = eval.getData().fields();
                         int i = 0;
                         while (it.hasNext()) {
 
