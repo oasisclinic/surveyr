@@ -6,6 +6,11 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
+/**
+ * Utilities for getting Lists from MongoDB
+ * @param <T> the type of List
+ * @author Bradley Davis
+ */
 public class MongoList<T> {
 
     private List<T> list = new LinkedList<>();

@@ -2,41 +2,30 @@
 # This file defines all application routes (Higher priority routes first)
 
 # API
-OPTIONS /api/*wholepath                                 utilities.Rest.options(wholepath)
+OPTIONS /api/*wholepath                                     utilities.Rest.options(wholepath)
 
 # Patients
-POST    /api/patients/create                            controllers.PatientController.create()
-GET     /api/patients                                   controllers.PatientController.findAll(limit: Int ?= -1)
-GET     /api/patients/:patientId                        controllers.PatientController.findById(patientId)
+POST    /api/patients/create                                controllers.PatientController.create()
+GET     /api/patients                                       controllers.PatientController.findAll(limit: Int ?= -1)
+GET     /api/patients/:patientId                            controllers.PatientController.findById(patientId)
 
 GET     /api/evaluations                                    controllers.EvaluationController.recent(limit: Int ?= 5)
 GET     /api/evaluations/start/:patientId/:surveyId         controllers.EvaluationController.request(surveyId, patientId)
-GET     /api/evaluations/start/:pin                         controllers.EvaluationController.start(pin: Int)
-GET     /api/evaluations/complete/:requestId/:responseId    controllers.EvaluationController.complete(requestId, responseId)
+GET     /api/evaluations/start/:pin                         controllers.PublicController.start(pin: Int)
+GET     /api/evaluations/complete/:requestId/:responseId    controllers.PublicController.complete(requestId, responseId)
 GET     /api/evaluations/results/:patientId/:surveyId       controllers.EvaluationController.findByPatientIdSurveyId(patientId, surveyId)
 GET     /api/evaluations/results/:patientId                 controllers.EvaluationController.findAllByPatientId(patientId)
 GET     /api/evaluations/:evaluationId                      controllers.EvaluationController.findById(evaluationId)
 DELETE  /api/evaluations/:evaluationId                      controllers.EvaluationController.deleteById(evaluationId)
 
-# Survey administration
-# GET     /api/surveys/start/:surveyId/:patientId         controllers.SurveyController.administerSurvey(surveyId, patientId)
-# GET     /api/surveys/complete/:requestId/:responseId    controllers.SurveyController.completeSurvey(requestId, responseId)
-
-# Survey history
-# GET     /api/surveys/requests                           controllers.SurveyController.findRequests(patientId: play.libs.F.Option[String], complete: play.libs.F.Option[java.lang.Boolean], limit: play.libs.F.Option[java.lang.Integer])
-# GET     /api/surveys/requests/:requestId                controllers.SurveyController.findRequest(requestId)
-
 # Surveys
-GET      /api/surveys                                      controllers.SurveyController.findAll()
-
-# Survey responses
-# GET     /api/surveys/responses/:surveyId/:patientId     controllers.SurveyController.findByPatientId(surveyId, patientId)
+GET      /api/surveys                                       controllers.SurveyController.findAll()
 
 # Authentication
-POST    /api/authenticate                               controllers.SecurityController.authenticate()
-GET     /api/logout                                     controllers.SecurityController.expire()
+POST    /api/authenticate                                   controllers.SecurityController.authenticate()
+GET     /api/logout                                         controllers.SecurityController.expire()
 
 # API documentation
-GET     /api/explore/patients                           controllers.ApiHelpController.getResource(path = "/api/patients")
-GET     /api/explore/surveys                            controllers.ApiHelpController.getResource(path = "/api/surveys")
-GET     /api/explore/surveyResponses                    controllers.ApiHelpController.getResource(path = "/api/surveyResponses")
+GET     /api/explore/patients                               controllers.ApiHelpController.getResource(path = "/api/patients")
+GET     /api/explore/surveys                                controllers.ApiHelpController.getResource(path = "/api/surveys")
+GET     /api/explore/surveyResponses                        controllers.ApiHelpController.getResource(path = "/api/surveyResponses")

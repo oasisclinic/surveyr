@@ -15,7 +15,7 @@ import static play.mvc.Results.internalServerError;
 import static play.mvc.Results.notFound;
 
 /**
- * Enables critical filters for all requests
+ * Enables critical filters for all requests and handles errors
  * @author Bradley Davis
  */
 public class Global extends GlobalSettings {

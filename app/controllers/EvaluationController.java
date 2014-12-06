@@ -1,21 +1,12 @@
 package controllers;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.wordnik.swagger.annotations.ApiOperation;
-import com.wordnik.swagger.annotations.ApiParam;
-import com.wordnik.swagger.annotations.ApiResponse;
-import com.wordnik.swagger.annotations.ApiResponses;
+import com.wordnik.swagger.annotations.*;
 import errors.EmptyResponseBodyException;
-import errors.InvalidParameterError;
 import errors.NoObjectsFoundError;
 import models.Evaluation;
-import models.Patient;
-import models.SurveyResponse;
-import models.SurveyResponseRequest;
 import models.dto.PatientSurveyHistoryDTO;
 import models.dto.SurveyDataDTO;
-import models.dto.UrlDto;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -36,12 +27,24 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
-//@Security.Authenticated(Secure.class)
+/**
+ * Handles all operations on evaluations.
+ * @author Bradley Davis
+ */
+@Api(value = "/api/evaluations", description = "Operations involving evaluations")
+@Security.Authenticated(Secure.class)
 public class EvaluationController extends Controller {
 
+    /**
+     * Generates a pin code to create a survey
+     * @param surveyId the survey ID to take
+     * @param patientId the patient ID to associate with a survey
+     * @return an evaluation containing the pin code
+     */
     @ApiOperation(nickname = "request", value = "Request an evaluation", httpMethod = "GET", response = Evaluation.class)
     @ApiResponses(value = {
-            @ApiResponse(code = 200, message = "Evaluation request created")
+            @ApiResponse(code = 200, message = "Evaluation request created"),
+            @ApiResponse(code = 401, message = "Unauthorized")
     })
     public static Promise<Result> request(@ApiParam(name = "surveyId", value = "the Qualtrics survey ID to administer", required = true)
                                                @PathParam("surveyId") String surveyId,
@@ -63,73 +66,17 @@ public class EvaluationController extends Controller {
 
     }
 
-    @ApiOperation(nickname = "start", value = "Take an evaluation", httpMethod = "GET")
+    /**
+     * Returns recent evaluations
+     * @param limit the number of evaluations to return
+     * @return recent evaluations
+     */
+    @ApiOperation(nickname = "recent", value = "Get recent evaluations", httpMethod = "GET", response = Evaluation.class)
     @ApiResponses(value = {
-            @ApiResponse(code = 302, message = "Evaluation in progress")
+            @ApiResponse(code = 200, message = "Evaluations found"),
+            @ApiResponse(code = 401, message = "Unauthorized"),
+            @ApiResponse(code = 404, message = "No evaluations found")
     })
-    public static Result start(@ApiParam(name = "pin", value = "the pin code for the evaluation", required = true)
-                                        @PathParam("pin") Integer pin) {
-
-        Evaluation eval = Evaluation.findOneByField("pinCode", pin);
-
-        try {
-            if(eval == null) {
-                return Rest.error(new InvalidParameterError());
-            }
-            return Rest.json(new UrlDto(Qualtrics.createSurveyUrl(eval.getSurveyId(), eval.getEvaluationId())));
-        } catch (EmptyResponseBodyException e) {
-            return Rest.error(new InvalidParameterError());
-        }
-
-    }
-
-    @ApiOperation(nickname = "complete", value = "Complete an evaluation", httpMethod = "GET")
-    @ApiResponses(value = {
-            @ApiResponse(code = 200, message = "Survey response recorded")
-    })
-    public static Promise<Result> complete(@ApiParam(name = "requestId", value = "the ID of the survey request", required = true)
-                                                 @PathParam("requestId") String requestId,
-                                                 @ApiParam(name = "responseId", value = "the Qualtrics-provided response ID", required = true)
-                                                 @PathParam("responseId") String responseId) {
-
-        Evaluation eval = Evaluation.findOneByField("evaluationId", requestId);
-        eval.setResponseId(responseId);
-        eval.setEndDate(new Date());
-        eval.setComplete(true);
-
-        Logger.debug(eval.toString());
-
-        Patient patient = Patient.findOne(eval.getPatientId());
-        patient.setLastInteraction(new Date());
-        patient.save();
-
-        WSRequestHolder surveyAnswers = Qualtrics.request("getLegacyResponseData")
-                .setQueryParameter("Format", "JSON")
-                .setQueryParameter("SurveyID", eval.getSurveyId())
-                .setQueryParameter("ResponseID", responseId)
-                .setQueryParameter("ExportQuestionIDs", "1");
-
-        return surveyAnswers.get().map(w -> {
-                    // discard any identifying data
-                    ObjectNode o = (ObjectNode) w.asJson().get(responseId);
-                    o.remove(Arrays.asList(new String[]{"IPAddress", "EmailAddress", "Name", "requestId", "ExternalDataReference", "ResponseSet"}));
-                    eval.setData(o);
-                    eval.save();
-
-                    Logger.debug(eval.toString());
-
-                    try {
-                        return Rest.json(eval);
-                    } catch (EmptyResponseBodyException e) {
-                        //TODO: replace with error
-                        return Rest.error(new NoObjectsFoundError("responses"));
-                    }
-
-                }
-        );
-
-    }
-
     public static Result recent(@ApiParam(name = "limit", value = "the number of evaluations to return", required = false)
                                 @PathParam("limit") Integer limit) {
 
@@ -143,6 +90,17 @@ public class EvaluationController extends Controller {
 
     }
 
+    /**
+     * Gets evaluations by patient ID
+     * @param patientId the patient ID
+     * @return evaluations
+     */
+    @ApiOperation(nickname = "findByPatientId", value = "Get evaluations by patientId", httpMethod = "GET", response = Evaluation.class)
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "Evaluations found"),
+            @ApiResponse(code = 401, message = "Unauthorized"),
+            @ApiResponse(code = 404, message = "No evaluations found")
+    })
     public static Result findAllByPatientId(@ApiParam(name = "patientId", value = "the ID of the patient", required = true)
                                             @PathParam("patientId") String patientId) {
 
@@ -155,6 +113,17 @@ public class EvaluationController extends Controller {
         }
     }
 
+    /**
+     * Gets an evaluation by ID
+     * @param evaluationId the evaluation ID
+     * @return an evaluation
+     */
+    @ApiOperation(nickname = "findById", value = "Get evaluation by ID", httpMethod = "GET", response = Evaluation.class)
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "Evaluation found"),
+            @ApiResponse(code = 401, message = "Unauthorized"),
+            @ApiResponse(code = 404, message = "No evaluation found")
+    })
     public static Result findById(@ApiParam(name = "evaluationId", value = "the ID of the evaluation", required = true)
                                             @PathParam("evaluationId") String evaluationId) {
 
@@ -167,6 +136,17 @@ public class EvaluationController extends Controller {
         }
     }
 
+    /**
+     * Deletes an evaluation
+     * @param evaluationId the evaluation ID
+     * @return an evaluation that has been deleted
+     */
+    @ApiOperation(nickname = "deleteById", value = "Delete evaluation", httpMethod = "DELETE", response = Evaluation.class)
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "Evaluation deleted"),
+            @ApiResponse(code = 401, message = "Unauthorized"),
+            @ApiResponse(code = 404, message = "No evaluations found")
+    })
     public static Result deleteById(@ApiParam(name = "evaluationId", value = "the ID of the evaluation", required = true)
                                   @PathParam("evaluationId") String evaluationId) {
 
@@ -180,7 +160,12 @@ public class EvaluationController extends Controller {
 
     }
 
-
+    /**
+     * Finds evaluations for one patient and one survey
+     * @param patientId the patient ID
+     * @param surveyId the survey ID
+     * @return evaluations
+     */
     @ApiOperation(nickname = "findByPatientId", value = "Retrieve all responses for a single user and survey", httpMethod = "GET", response = PatientSurveyHistoryDTO.class)
     @ApiResponses(value = {@ApiResponse(code = 200, message = "Surveys found")})
     public static Promise<Result> findByPatientIdSurveyId(@ApiParam(name = "patientId", value = "the ID of the patient", required = true)
@@ -188,36 +173,47 @@ public class EvaluationController extends Controller {
                                                   @ApiParam(name = "surveyId", value = "the ID of the survey", required = true)
                                                   @PathParam("surveyId") String surveyId) {
 
+        // Get survey definitions
         WSRequestHolder surveyDef = Qualtrics.request("getSurvey").setQueryParameter("SurveyID", surveyId);
 
+        // Get evaluations
         List<Evaluation> responses = Evaluation.findByPatientIdSurveyId(patientId, surveyId);
-        Logger.info("found: " + responses);
 
+        // Then
         return surveyDef.get().map(response -> {
 
+                    // Get XML from survey definition (no JSON available)
                     Document d = XML.fromString(response.getBody());
 
+                    // Create a DTO
                     PatientSurveyHistoryDTO psh = new PatientSurveyHistoryDTO();
 
                     for (Evaluation eval : responses) {
 
+                        // Extract end date of the survey
                         String testDate = eval.getData().findValuesAsText("EndDate").get(0);
                         DateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
                         Date date = formatter.parse(testDate);
 
+                        // Create single response DTO
                         SurveyDataDTO dataDTO = new SurveyDataDTO(date);
 
                         HashMap<String, String> q = new HashMap<>();
 
+                        // Get data fields
                         Iterator<Map.Entry<String, JsonNode>> it = eval.getData().fields();
                         int i = 0;
+
+                        // For all fields, if key is either QID_nubmber or QIDnumber_number
                         while (it.hasNext()) {
 
                             Map.Entry<String, JsonNode> o = it.next();
                             if (o.getKey().matches("[Q][I][D]\\d") || o.getKey().matches("[Q][I][D]\\d[_]\\d")) {
 
+                                // Add question answer
                                 dataDTO.addData(String.valueOf(i), o.getValue().asInt());
 
+                                // Get question text
                                 NodeList l = d.getElementsByTagName("Questions").item(0).getChildNodes();
                                 for (int z = 0; z < l.getLength(); z++) {
 
@@ -237,11 +233,13 @@ public class EvaluationController extends Controller {
 
                         }
 
+                        // add definition and data to response
                         psh.setDefinition(q);
                         psh.addData(dataDTO);
 
                     }
 
+                    // return DTO with graph data
                     return Rest.json(psh);
                 }
         );

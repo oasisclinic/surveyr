@@ -3,6 +3,10 @@ package models.dto;
 import java.util.Date;
 import java.util.HashMap;
 
+/**
+ * DTO for one response to a survey
+ * @author Bradley Davis
+ */
 public class SurveyDataDTO {
 
     private Date date;

@@ -10,6 +10,10 @@ import utilities.MongoList;
 
 import java.util.*;
 
+/**
+ * Embodies a response to a survey and contains all related information.
+ * @author Bradley Davis
+ */
 public class Evaluation {
 
     private static final MongoCollection collection = PlayJongo.getCollection("evaluations");
@@ -67,7 +71,7 @@ public class Evaluation {
     }
 
     public static List<Evaluation> findRecent(int limit) {
-        return new MongoList<Evaluation>(collection.find().limit(limit).sort("{startDate: -1}"), Evaluation.class).getList();
+        return new MongoList<Evaluation>(collection.find().limit(limit).sort("{startDate: 1}"), Evaluation.class).getList();
     }
 
     public static List<Evaluation> findByField(String fieldName, Object value) {

@@ -18,12 +18,23 @@ import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
-//@Security.Authenticated(Secure.class)
+/**
+ * Handles patient operations.
+ * @author Bradley Davis
+ */
+@Security.Authenticated(Secure.class)
 @Api(value = "/api/patients", description = "Operations involving patients")
 public class PatientController extends Controller {
 
+    /**
+     * Creates a new patient
+     * @return the patient that was created
+     */
     @ApiOperation(nickname = "create", value = "Create a patient record", httpMethod = "POST", response = Patient.class)
-    @ApiResponses(value = {@ApiResponse(code = 201, message = "New patient successfully created")})
+    @ApiResponses(value = {
+            @ApiResponse(code = 201, message = "New patient successfully created"),
+            @ApiResponse(code = 401, message = "Unauthorized")
+    })
     @ApiImplicitParams(value = {@ApiImplicitParam(value = "Patient object to create", name = "body", required = true, paramType = "body", dataType = "Patient")})
     @Consumes("application/json")
     @Produces("application/json")
@@ -47,10 +58,16 @@ public class PatientController extends Controller {
 
     }
 
+    /**
+     * Gets all patients
+     * @param limit the number of patients to return (-1 to return all)
+     * @return all patients
+     */
     @ApiOperation(nickname = "findAll", value = "Finds all patients", httpMethod = "GET", responseContainer = "List", response = Patient.class)
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Patients found"),
             @ApiResponse(code = 400, message = "Limit parameter must be >= -1"),
+            @ApiResponse(code = 401, message = "Unauthorized"),
             @ApiResponse(code = 404, message = "No patients found")
     })
     @Produces("application/json")
@@ -76,9 +93,15 @@ public class PatientController extends Controller {
 
     }
 
+    /**
+     * Finds a patient by ID
+     * @param patientId the patient ID
+     * @return the patient
+     */
     @ApiOperation(nickname = "findById", value = "Finds a patient by his identifier", httpMethod = "GET", response = Patient.class)
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Patient found"),
+            @ApiResponse(code = 401, message = "Unauthorized"),
             @ApiResponse(code = 404, message = "No such patient found")
     })
     @Produces("application/json")

@@ -13,6 +13,10 @@ import utilities.Secure;
 
 import java.util.*;
 
+/**
+ * Embodies a patient in the clinic.
+ * @author Bradley Davis
+ */
 @ApiModel(value = "A patient is a client of the clinic")
 public class Patient {
 

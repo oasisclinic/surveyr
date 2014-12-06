@@ -4,6 +4,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * DTO for graph data
+ * @author Bradley Davis
+ */
 public class PatientSurveyHistoryDTO {
 
     private Map<String, String> definition;
