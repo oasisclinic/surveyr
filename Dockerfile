@@ -1,4 +1,4 @@
-#FROM dockerfile/ubuntu
+FROM dockerfile/ubuntu
 FROM dockerfile/java:oracle-java8
 MAINTAINER Bradley Davis <bradley.davis@unc.edu>
 
