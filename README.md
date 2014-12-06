@@ -1,13 +1,26 @@
-# OASIS Surveyor
-collects and aggregates Qualtrics surveys
+# OASIS Surveyr
+Surveyr is built for Outreach and Support Intervention Services at The University of North Carolina at Chapel Hill to collect and aggregate Qualtrics surveys while maintaining HIPAA compliance.
+
+This repository houses all backend code necessary to produce the Surveyr API as well as the latest distribution version of the frontend application. To see the source of the frontend application, please check out [Displayr](https://github.com/oasisclinic/displayr).
+
+Stack
+---------------
+Surveyr is built with:
+- Play Framework (Java)
+- AngularJS
+- MongoDB
+
+Documentation
+---------------
+You can explore our API by plugging in the URLs [http://54.173.152.217/swagger/patients,  http://54.173.152.217/swagger/surveys, http://54.173.152.217/swagger/evaluations, http://54.173.152.217/swagger/security] into [Swagger UI](http://54.173.152.217/swagger/index.html). We also have a Javadoc [here](http://54.173.152.217/javadoc/index.html).
 
 Running Surveyor on Ubuntu with Docker and DockerHub
 ---------------
-Install Docker by following these [instructions](https://docs.docker.com/installation/ubuntulinux/)
+Install Docker by following these [instructions](https://docs.docker.com/installation/ubuntulinux/).
 
 Then, run
 ```
 sudo docker run -d -p 27017:27017 --name mongodb dockerfile/mongodb 
-sudo docker run -d -p 80:9000 --link mongodb:mongo oasisclinic/surveyor
+sudo docker run -d -p 80:9000 --link mongodb:mongo oasisclinic/surveyr
 ```
-These commands create a Docker container running MongoDB on port 27017 and links it to a container which has the latest Play framework code from master
+The oasisclinic/surveyr image is retrieved from DockerHub which hosts an automated build repository based upon the master branch of this repository.
