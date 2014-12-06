@@ -208,7 +208,7 @@ public class EvaluationController extends Controller {
                         while (it.hasNext()) {
 
                             Map.Entry<String, JsonNode> o = it.next();
-                            if (o.getKey().matches("[Q][I][D]\\d") || o.getKey().matches("[Q][I][D]\\d[_]\\d")) {
+                            if (o.getKey().matches("[Q][I][D]\\d+") || o.getKey().matches("[Q][I][D]\\d+[_]\\d+")) {
 
                                 // Add question answer
                                 dataDTO.addData(String.valueOf(i), o.getValue().asInt());
