@@ -28,4 +28,8 @@ GET     /api/logout                                         controllers.Security
 # API documentation
 GET     /api/explore/patients                               controllers.ApiHelpController.getResource(path = "/api/patients")
 GET     /api/explore/surveys                                controllers.ApiHelpController.getResource(path = "/api/surveys")
-GET     /api/explore/surveyResponses                        controllers.ApiHelpController.getResource(path = "/api/surveyResponses")
+GET     /api/explore/evaluations                            controllers.ApiHelpController.getResource(path = "/api/evaluations")
+GET     /api/explore/security                               controllers.ApiHelpController.getResource(path = "/api/security")
+
+# Static assets
+GET     /*file                                              controllers.Assets.at(path="/public", file)
