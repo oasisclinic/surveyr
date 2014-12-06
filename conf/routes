@@ -26,10 +26,10 @@ POST    /api/authenticate                                   controllers.Security
 GET     /api/logout                                         controllers.SecurityController.expire()
 
 # API documentation
-GET     /api/explore/patients                               controllers.ApiHelpController.getResource(path = "/api/patients")
-GET     /api/explore/surveys                                controllers.ApiHelpController.getResource(path = "/api/surveys")
-GET     /api/explore/evaluations                            controllers.ApiHelpController.getResource(path = "/api/evaluations")
-GET     /api/explore/security                               controllers.ApiHelpController.getResource(path = "/api/security")
+GET     /swagger/patients                                   controllers.ApiHelpController.getResource(path = "/api/patients")
+GET     /swagger/surveys                                    controllers.ApiHelpController.getResource(path = "/api/surveys")
+GET     /swagger/evaluations                                controllers.ApiHelpController.getResource(path = "/api/evaluations")
+GET     /swagger/security                                   controllers.ApiHelpController.getResource(path = "/api/security")
 
 # Static assets
 GET     /*file                                              controllers.Assets.at(path="/public", file)

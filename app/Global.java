@@ -20,9 +20,9 @@ import static play.mvc.Results.notFound;
  */
 public class Global extends GlobalSettings {
 
-    public <T extends EssentialFilter> Class<T>[] filters() {
-        return new Class[]{SecurityHeadersFilter.class, GzipFilter.class};
-    }
+//    public <T extends EssentialFilter> Class<T>[] filters() {
+//        return new Class[]{SecurityHeadersFilter.class, GzipFilter.class};
+//    }
 
     public F.Promise<Result> onError(Http.RequestHeader request, Throwable t) {
         return F.Promise.<Result>pure(Rest.error(new PlayError(t.getMessage(), 500)));
