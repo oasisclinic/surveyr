@@ -25,4 +25,4 @@ RUN mv /tmp/surveyor-master/target/universal/stage/ /app/
 RUN rm -rf /tmp
 
 WORKDIR /app/stage
-ENTRYPOINT ["/app/stage/bin/oasis-surveyor", "-Dapplication.secret=or7_xe;JHTm4@OS`cjh/PM4=7okeqi8h^Bba0_;NiPJSvijKH^:Q>03Qygq^`W9V"]
+ENTRYPOINT ["/app/stage/bin/oasis-surveyor", "-Dapplication.domain=http://54.173.152.217 -Dapplication.secret=or7_xe;JHTm4@OS`cjh/PM4=7okeqi8h^Bba0_;NiPJSvijKH^:Q>03Qygq^`W9V"]
