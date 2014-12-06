@@ -33,3 +33,4 @@ GET     /swagger/security                                   controllers.ApiHelpC
 
 # Static assets
 GET     /*file                                              controllers.Assets.at(path="/public", file)
+GET     /                                                   controllers.Assets.at(path="/public", file="index.html")
