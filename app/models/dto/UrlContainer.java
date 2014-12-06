@@ -4,11 +4,11 @@ package models.dto;
  * DTO for a URL
  * @author Bradley Davis
  */
-public class UrlDTO {
+public class UrlContainer {
 
     public String url;
 
-    public UrlDTO(String url) {
+    public UrlContainer(String url) {
         this.url = url;
     }
 }

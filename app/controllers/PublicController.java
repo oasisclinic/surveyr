@@ -7,7 +7,7 @@ import errors.InvalidParameterError;
 import errors.NoObjectsFoundError;
 import models.Evaluation;
 import models.Patient;
-import models.dto.UrlDTO;
+import models.dto.UrlContainer;
 import play.Logger;
 import play.libs.F;
 import play.libs.ws.WSRequestHolder;
@@ -31,7 +31,7 @@ public class PublicController {
      * @param pin the pin code of the survey
      * @return URL of Qualtrics survey
      */
-    @ApiOperation(nickname = "start", value = "Take an evaluation using a pin code", httpMethod = "GET", response=UrlDTO.class)
+    @ApiOperation(nickname = "start", value = "Take an evaluation using a pin code", httpMethod = "GET", response=UrlContainer.class)
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "URL of survey returned"),
             @ApiResponse(code = 400, message = "Bad pin code")
@@ -45,7 +45,7 @@ public class PublicController {
             if(eval == null) {
                 return Rest.error(new InvalidParameterError());
             }
-            return Rest.json(new UrlDTO(Qualtrics.createSurveyUrl(eval.getSurveyId(), eval.getEvaluationId())));
+            return Rest.json(new UrlContainer(Qualtrics.createSurveyUrl(eval.getSurveyId(), eval.getEvaluationId())));
         } catch (EmptyResponseBodyException e) {
             return Rest.error(new InvalidParameterError());
         }
