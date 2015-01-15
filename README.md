@@ -1,6 +1,8 @@
 # OASIS Surveyr
 Surveyr is built for Outreach and Support Intervention Services at The University of North Carolina at Chapel Hill to collect and aggregate Qualtrics surveys while maintaining HIPAA compliance.
 
+**DISCLAIMER: This or any product associated with these accounts are not HIPPA compliant. HIPPA compliance requires continual maintenance and observation, as well as many features these applications lack such as protocols for provisioning new users. DO NOT USE THIS IN A HIPPA SETTING AS IS!**
+
 This repository houses all backend code necessary to produce the Surveyr API as well as the latest distribution version of the frontend application. To see the source of the frontend application, please check out [Displayr](https://github.com/oasisclinic/displayr).
 
 Stack
